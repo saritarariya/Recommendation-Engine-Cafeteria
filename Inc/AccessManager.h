@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "databaseManager.h"
 
 class AccessManager {
 public:
@@ -12,7 +13,7 @@ public:
     };
     void grantAccess(const std::string& email);
     AccessManager();
-
+    DatabaseManager *dbManager;
 private:
     std::vector<User> users;
     std::string extractRole(const std::string& email);

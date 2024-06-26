@@ -13,7 +13,7 @@
 
 #define MAX_LEN 200
 
-class Client 
+class Client
 {
 private:
     bool exitFlag = false;

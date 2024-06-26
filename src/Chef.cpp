@@ -1,6 +1,10 @@
 #include "Chef.h"
 
-void Chef::showOptions() {
+Chef::Chef(Client*client) {
+   this->client = client;
+}
+
+void Chef::chefFunctions() {
     std::cout << "Please choose an operation:" << std::endl;
     std::cout << "1. Provide Feedback" << std::endl;
     std::cout << "2. Choose Food Items for Next Day" << std::endl;

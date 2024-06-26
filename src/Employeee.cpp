@@ -1,6 +1,11 @@
 #include "Employee.h"
 
-void Employee::showOptions() {
+
+Employee::Employee(Client*client) {
+   this->client = client;
+}
+
+void Employee::employeeFunctions() {
     std::cout << "Please choose an operation:" << std::endl;
     std::cout << "1. Provide Feedback" << std::endl;
     std::cout << "2. Choose Food Items for Next Day" << std::endl;

@@ -143,6 +143,5 @@ bool Client::connectToServer()
 		std::cerr << e.what() << std::endl;
         return 0;
 	}
-    std::cout<<"connect to server successfully"<<std::endl;
     return 1;
 }

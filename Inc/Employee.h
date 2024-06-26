@@ -3,15 +3,15 @@
 #include <string>
 #include <iostream>
 #include "Client.h"
-
-class Employee : public Client
+class Employee
 {   
     public:
-    std::string email;
     // std::string provideFeedback();
     // std::string chooseFoodItemsForNextDay();
     // int provideRating(); 
     // std::string getFoodItemsForNextDay();
-    void showOptions();
+    Client* client;
+    Employee(Client*);
+    void employeeFunctions();
 };
 #endif

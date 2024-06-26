@@ -14,7 +14,7 @@ void AccessManager::grantAccess(const std::string& email) {
         grantEmployeeAccess(email);
     } else if (role.find("chef") != std::string::npos) {
         grantChefAccess(email);
-    } else if (role.find("chef") != std::string::npos) {
+    } else if (role.find("admin") != std::string::npos) {
         grantAdminAccess(email);
     }
 }
@@ -27,45 +27,27 @@ std::string AccessManager::extractRole(const std::string& email) {
             break;
         }
     }
-    std::cout<<token<<std::endl;
     return token;
 }
 
 void AccessManager::grantEmployeeAccess(const std::string& email) {
     std::cout << "Granting employee access to " << email << std::endl;
-    Employee * E1 = new Employee();
-    if(E1->connectToServer() == 1) {
-        E1->mailID = email;
-        E1->showOptions();
-        E1->sendRole("employee");
-        E1->messageTransfer();
-    } else {
-        std::cout<<"unable to connect to server"<<std::endl;
-    }
+    Employee* employee = new Employee(this->dbManager->client); 
+    employee->client->sendRole("EMPLOYEE");
 }
 
 void AccessManager::grantChefAccess(const std::string& email) {
     std::cout << "Granting chef access to " << email << std::endl;
-    Chef * E1 = new Chef();
-    if(E1->connectToServer() == 1) {
-        E1->mailID = email;
-        E1->showOptions();
-        E1->sendRole("chef");
-        E1->messageTransfer();
-    } else {
-        std::cout<<"unable to connect to server"<<std::endl;
-    }
+    Chef*chef = new Chef(this->dbManager->client);
+    chef->client->sendRole("chef");
+    
 }
 
 void AccessManager::grantAdminAccess(const std::string& email) {
     std::cout << "Granting admin access to " << email << std::endl;
-    Admin * E1 = new Admin();
-    if(E1->connectToServer() == 1) {
-    E1->mailID = email;
-    E1->showOptions();
-    E1->sendRole("Admin");
-    E1->messageTransfer();
-     } else {
-        std::cout<<"unable to connect to server"<<std::endl;
-    }
+    Client *client = new Client();
+    Admin*admin = new Admin(client);
+    admin->client->connectToServer();
+    admin->client->sendRole("HY mehul sarita this side !!!!");
+    admin->adminFunctions(dbManager);
 }

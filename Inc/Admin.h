@@ -2,16 +2,22 @@
 #define HEADER_H_ADMIN
 #include <iostream>
 #include <string>
+#include <limits>
 #include "Client.h"
+#include "databaseManager.h"
 
-class Admin : public Client
+using namespace std; 
+class Admin
 {
     public:
+    Client* client;
+    Admin(Client*);
     std::string mailId;
-    std::string addMenuItem();
-    std::string deleteMenuItem();
-    std::string updateMenuItem(std::string price , std::string availabily);
-    //std::string getMonthlyReport(std::string foodItem);
+    void addMenuItem(DatabaseManager*);
+    void deleteMenuItem(DatabaseManager*);
+    void updateMenuItem(DatabaseManager*);
+    void adminFunctions(DatabaseManager*);
     void showOptions();
+    void clearInputBuffer();
 };
 #endif
