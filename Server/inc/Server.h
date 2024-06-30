@@ -1,5 +1,5 @@
-#ifndef HEADER_H_SERVER
-#define HEADER_H_SERVER
+#ifndef SERVER_H
+#define SERVER_H
 
 #include <iostream>
 #include <winsock2.h>
@@ -9,45 +9,40 @@
 #include <mutex>
 #include <vector>
 #include <cassert>
+#include "clientRequestHandler.h"
 
-// Link with the Ws2_32.lib library
 #pragma comment(lib, "Ws2_32.lib")
 
-struct ClientsData {
+struct ClientsData
+{
     int id;
     SOCKET socket;
-    char name[100];  // Adjust size as needed
+    std::string email;
 };
 
-class Server {
+class Server
+{
+private:
     SOCKET serverSocket;
-    std::thread thrd;
-    std::vector<ClientsData> collectionOfClients;
-    int countOfClients = 0;
-    std::mutex printMutex, clientsMutex;
-    struct sockaddr_in server;
-    struct sockaddr_in client;
     SOCKET clientSocket;
-public:
-    Server() : serverSocket(INVALID_SOCKET), clientSocket(INVALID_SOCKET) {}
-    ~Server() {
-        closesocket(serverSocket);
-        WSACleanup();
-    }
-
-    void setName(const int id, const char* name);
-    void displayMessageOnServer(const std::string& str);
-    void broadcastMessage(const std::string& message, const int senderId);
-    void endConnection(const int id);
+    struct sockaddr_in server, client;
+    std::vector<ClientsData> collectionOfClients;
+    std::mutex clientsMutex;
+    int countOfClients;
     void handleClient(const SOCKET clientSocket, const int id);
+    void endConnection(int id);
+    void closeServer();
+public:
+    Server();
+    ~Server();
+
     int createSocket();
     void assignServerAddress();
     int bindSocketAddress();
-    void closeServer();
     bool handleMultipleClients();
     SOCKET getSocketHandler();
     void handleCtrlC(int signal);
     int listenFunction();
 };
 
-#endif
+#endif // SERVER_H

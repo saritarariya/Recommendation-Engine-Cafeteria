@@ -124,7 +124,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>STATIC_CONCPP;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Sarita.sharma\Desktop\Recommendation-Engine-Cafeteria\Inc;E:\mysql-connector-c++-8.4.0-winx64\include\jdbc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Recommendation-Engine-Cafeteria\Inc;E:\mysql-connector-c++-8.4.0-winx64\include\jdbc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,9 +141,9 @@
     <ClInclude Include="Inc\CafeteriaManager.h" />
     <ClInclude Include="Inc\Chef.h" />
     <ClInclude Include="Inc\Client.h" />
-    <ClInclude Include="Inc\databaseManager.h" />
     <ClInclude Include="Inc\Employee.h" />
     <ClInclude Include="Inc\Food.h" />
+    <ClInclude Include="Inc\User.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AccessManger.cpp" />
@@ -151,7 +151,6 @@
     <ClCompile Include="src\Chef.cpp" />
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\clientmain.cpp" />
-    <ClCompile Include="src\databaseManager.cpp" />
     <ClCompile Include="src\Employeee.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

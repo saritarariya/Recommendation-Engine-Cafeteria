@@ -1,68 +1,13 @@
 #include "Server.h"
 
-void Server::setName(const int id, const char* name) {
-    std::lock_guard<std::mutex> lock(clientsMutex);
-    for (auto& client : collectionOfClients) {
-        if (client.id == id) {
-            strncpy_s(client.name, name, sizeof(client.name) - 1);
-            client.name[sizeof(client.name) - 1] = '\0';
-            break;
-        }
-    }
-}
+Server::Server() : serverSocket(INVALID_SOCKET), clientSocket(INVALID_SOCKET), countOfClients(0) {}
 
-void Server::displayMessageOnServer(const std::string& str) {
-    std::lock_guard<std::mutex> lock(printMutex);
-    std::cout << str << std::endl;
-}
-
-void Server::broadcastMessage(const std::string& message, const int senderId) {
-    std::lock_guard<std::mutex> lock(clientsMutex);
-    for (const auto& client : collectionOfClients) {
-        if (client.id != senderId) {
-            send(client.socket, message.c_str(), message.size(), 0);
-        }
-    }
-}
-
-void Server::endConnection(const int id) {
-    std::lock_guard<std::mutex> lock(clientsMutex);
-    for (auto it = collectionOfClients.begin(); it != collectionOfClients.end(); ++it) {
-        if (it->id == id) {
-            closesocket(it->socket);
-            collectionOfClients.erase(it);
-            break;
-        }
-    }
-}
-
-void Server::handleClient(const SOCKET clientSocket, const int id) {
-    char name[100];
-    recv(clientSocket, name, sizeof(name), 0);
-    setName(id, name);
-
-    while (true) {
-        char buffer[256];
-        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-        if (bytesReceived <= 0) {
-            endConnection(id);
-            break;
-        }
-        buffer[bytesReceived] = '\0';
-        std::string message = "HYY yes you guys joined";
-        displayMessageOnServer(message);
-        broadcastMessage(message, id);
-    }
+Server::~Server() {
+    closeServer();
+    
 }
 
 int Server::createSocket() {
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        std::cerr << "WSAStartup failed: " << result << std::endl;
-        return 1;
-    }
-
     serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (serverSocket == INVALID_SOCKET) {
         std::cerr << "Error at socket(): " << WSAGetLastError() << std::endl;
@@ -76,26 +21,35 @@ void Server::assignServerAddress() {
     server.sin_family = AF_INET;
     server.sin_port = htons(8080);
     server.sin_addr.s_addr = INADDR_ANY;
+    memset(&(server.sin_zero), 0, 8);
 }
 
 int Server::bindSocketAddress() {
-    int result = bind(serverSocket, (struct sockaddr*)&server, sizeof(server));
+    int result = ::bind(serverSocket, (sockaddr*)&server, sizeof(server));
     if (result == SOCKET_ERROR) {
         std::cerr << "Bind failed: " << WSAGetLastError() << std::endl;
         closesocket(serverSocket);
         WSACleanup();
         return 1;
     }
-    return 0;
+     return 0;
 }
 
 void Server::closeServer() {
-    closesocket(serverSocket);
+      if (serverSocket != INVALID_SOCKET) {
+        closesocket(serverSocket);
+        serverSocket = INVALID_SOCKET;
+    }
     WSACleanup();
 }
 
 bool Server::handleMultipleClients() {
-    listen(serverSocket, SOMAXCONN);
+    if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+        std::cerr << "Listen failed: " << WSAGetLastError() << std::endl;
+        closesocket(serverSocket);
+        WSACleanup();
+        return false;
+    }
     while (true) {
         int clientLen = sizeof(client);
         clientSocket = accept(serverSocket, (struct sockaddr*)&client, &clientLen);
@@ -103,7 +57,6 @@ bool Server::handleMultipleClients() {
             std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
             return false;
         }
-
         std::lock_guard<std::mutex> lock(clientsMutex);
         ClientsData clientData;
         clientData.id = countOfClients++;
@@ -136,5 +89,35 @@ int Server::listenFunction() {
         WSACleanup();
         return 1;
     }
+    std::cout << "Listening on socket..." << std::endl;
     return 0;
+}
+
+void Server::handleClient(const SOCKET clientSocket, const int id) {
+    DatabaseManager databaseManager;
+    ClientRequestHandler requestHandler(databaseManager);
+    char buffer[256];
+    
+    while (true) {
+        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+        if (bytesReceived <= 0) {
+            endConnection(id);
+            break;
+        }
+        buffer[bytesReceived] = '\0';
+        std::string request(buffer);
+        std::cout<<request<<std::endl;
+        requestHandler.processRequest(request, clientSocket, id);
+    }
+}
+
+void Server::endConnection(int id) {
+    std::lock_guard<std::mutex> lock(clientsMutex);
+    auto it = std::find_if(collectionOfClients.begin(), collectionOfClients.end(),
+                           [id](const ClientsData& data) { return data.id == id; });
+    if (it != collectionOfClients.end()) {
+        std::cout << "Client " << id << " (" << it->email << ") left the server." << std::endl;
+        closesocket(it->socket);
+        collectionOfClients.erase(it);
+    }
 }

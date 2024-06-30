@@ -30,13 +30,13 @@
     <ClInclude Include="Inc\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\databaseManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Employee.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Food.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\User.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -51,9 +51,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\databaseManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Employeee.cpp">

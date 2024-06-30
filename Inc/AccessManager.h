@@ -3,19 +3,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "databaseManager.h"
+#include "Client.h"
 
 class AccessManager {
 public:
-    struct User {
-        std::string email;
-        std::string role;
-    };
     void grantAccess(const std::string& email);
-    AccessManager();
-    DatabaseManager *dbManager;
+    AccessManager(Client*);
 private:
-    std::vector<User> users;
+    Client*client;
     std::string extractRole(const std::string& email);
     void grantEmployeeAccess(const std::string& email);
     void grantChefAccess(const std::string& email);

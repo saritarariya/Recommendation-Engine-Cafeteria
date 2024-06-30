@@ -6,7 +6,9 @@
 #include <iostream>
 #include <sstream>
 
-AccessManager::AccessManager() {}
+AccessManager::AccessManager(Client *client) {
+    this->client = client;
+}
 
 void AccessManager::grantAccess(const std::string& email) {
     std::string role = extractRole(email);
@@ -32,22 +34,21 @@ std::string AccessManager::extractRole(const std::string& email) {
 
 void AccessManager::grantEmployeeAccess(const std::string& email) {
     std::cout << "Granting employee access to " << email << std::endl;
-    Employee* employee = new Employee(this->dbManager->client); 
-    employee->client->sendRole("EMPLOYEE");
+    Employee* employee = new Employee(client);
+    employee->performRoleFunctions();
+    delete employee;
 }
 
 void AccessManager::grantChefAccess(const std::string& email) {
     std::cout << "Granting chef access to " << email << std::endl;
-    Chef*chef = new Chef(this->dbManager->client);
-    chef->client->sendRole("chef");
-    
+    Chef* chef = new Chef(client);
+    chef->performRoleFunctions();
+    delete chef;
 }
 
 void AccessManager::grantAdminAccess(const std::string& email) {
     std::cout << "Granting admin access to " << email << std::endl;
-    Client *client = new Client();
-    Admin*admin = new Admin(client);
-    admin->client->connectToServer();
-    admin->client->sendRole("HY mehul sarita this side !!!!");
-    admin->adminFunctions(dbManager);
+    Admin* admin = new Admin(client);
+    admin->performRoleFunctions();
+    delete admin;
 }

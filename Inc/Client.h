@@ -18,11 +18,10 @@ class Client
 private:
     bool exitFlag = false;
     std::thread tSend, tReceive;
-    SOCKET clientSocket;
     struct sockaddr_in client;
     int portNumber;
 public:
-    Client() : clientSocket(INVALID_SOCKET), portNumber(0) {}
+    SOCKET clientSocket;
     ~Client() {
         closesocket(clientSocket);
         WSACleanup();
@@ -37,6 +36,10 @@ public:
     void sendMessage(SOCKET clientSocket);
     void recvMessage(SOCKET clientSocket);
     bool connectToServer();
+    bool verifyUser();
+    void setEmail(const std::string& email);
+    std::string getEmail();
+    SOCKET getClientSocket();
 };
 
 #endif

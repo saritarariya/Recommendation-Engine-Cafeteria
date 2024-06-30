@@ -1,10 +1,11 @@
+
 #include "Chef.h"
 
 Chef::Chef(Client*client) {
-   this->client = client;
+  this->client = client;
 }
 
-void Chef::chefFunctions() {
+void Chef::performRoleFunctions() {
     std::cout << "Please choose an operation:" << std::endl;
     std::cout << "1. Provide Feedback" << std::endl;
     std::cout << "2. Choose Food Items for Next Day" << std::endl;

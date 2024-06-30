@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 #include <stdlib.h>
-#include <Client.h>
 #include <mysql_driver.h>
 #include <mysql_connection.h>
 #include <cppconn/statement.h>
@@ -15,22 +15,22 @@
 using namespace std;
 using namespace sql;
 
-class DatabaseManager {
+class DatabaseManager
+{
 private:
-    string server = "tcp://127.0.0.1:3306";
+    string DatabaseServer = "tcp://127.0.0.1:3306";
     string username = "root";
     string password = "Madhusakshi@123";
     string database = "CafeteriaProjectDatabase";
-    Connection* con;
+    Connection *databaseConnection;
+
 public:
-    Client *client;
-    DatabaseManager(Client *);
     bool connect();
-    bool loginUser(const string& email);
-    bool addMenuItem(const string& name, const string& description, double price, const string& category, bool availability);
-    bool deleteMenuItem(const string& name);
-    bool updateMenuItem(const string& name, double price, bool availability);
-    void showAllMenuItems();
+    bool loginUser(const string &email);
+    bool addMenuItem(const string &name, const string &description, double price, const string &category, bool availability);
+    bool deleteMenuItem(const string &name);
+    bool updateMenuItem(const string &name, double price, bool availability);
+    std::string showAllMenuItems();
 };
 
 #endif // DATABASE_MANAGER_H

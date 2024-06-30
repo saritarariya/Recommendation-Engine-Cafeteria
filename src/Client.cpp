@@ -11,54 +11,7 @@ void Client::handleCtrlC(int signal)
     std::cout << signal;
     exit(signal);
 }
-
-void Client::sendMessage(SOCKET clientSocket)
-{
-    while (1)
-    {
-        char str[MAX_LEN];
-        std::cin.getline(str, MAX_LEN);
-        send(clientSocket, str, sizeof(str), 0);
-        if (strcmp(str, "#exit") == 0)
-        {
-            exitFlag = true;
-            tReceive.detach();
-            closesocket(clientSocket);
-            return;
-        }
-    }
-}
-
-void Client::recvMessage(SOCKET clientSocket)
-{
-    char welcomemsg[MAX_LEN];
-    int bytes_received1 = recv(clientSocket, welcomemsg, sizeof(welcomemsg), 0);
-    if (bytes_received1 <= 0)
-    {
-        return;
-    }
-    std::cout << welcomemsg << std::endl;
-    while (1)
-    {
-        if (exitFlag)
-        {
-            return;
-        }
-        char str[MAX_LEN];
-        recv(clientSocket, str, sizeof(str), 0);
-        if (strcmp(str, "#exit") == 0)
-        {
-            std::cout << "Sorry, server is not present anymore" << std::endl;
-            exitFlag = true;
-            tReceive.detach();
-            closesocket(clientSocket);
-            exit(2);
-        }
-        std::cout << str << std::endl;
-        fflush(stdout);
-    }
-}
-
+    
 int Client::createSocket()
 {
     WSADATA wsaData;
@@ -69,7 +22,7 @@ int Client::createSocket()
         return 1;
     }
 
-    clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    this->clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (clientSocket == INVALID_SOCKET)
     {
         std::cerr << "Error at socket(): " << WSAGetLastError() << std::endl;
@@ -101,28 +54,8 @@ void Client::assignClientAddress(const std::string &ipAddress, int port)
     inet_pton(AF_INET, ipAddress.c_str(), &client.sin_addr);
 }
 
-void Client::sendRole(const std::string &role)
-{
-    char roleBuffer[MAX_LEN];
-    strcpy_s(roleBuffer, role.c_str());
-    send(clientSocket, roleBuffer, sizeof(roleBuffer), 0);
-}
 
-void Client::messageTransfer()
-{
-    std::thread t1(&Client::sendMessage, this, clientSocket);
-    std::thread t2(&Client::recvMessage, this, clientSocket);
-    tSend = std::move(t1);
-    tReceive = std::move(t2);
-    if (tSend.joinable())
-    {
-        tSend.join();
-    }
-    if (tReceive.joinable())
-    {
-        tReceive.join();
-    }
-}
+
 
 bool Client::connectToServer()
 {
@@ -144,4 +77,47 @@ bool Client::connectToServer()
         return 0;
 	}
     return 1;
+}
+
+bool Client::verifyUser() {
+    // Construct the request string with "login_user" followed by the email ID
+    std::string request = "loginUser:" + mailID + '\0';  // Ensure null-termination
+
+    // Send the request string to the server
+    if (send(clientSocket, request.c_str(), request.size(), 0) == -1) {
+        std::cerr << "Failed to send request" << std::endl;
+        return false;
+    }
+
+    // Prepare buffer for receiving the response
+    char response[MAX_LEN];
+    int bytesReceived = recv(clientSocket, response, MAX_LEN - 1, 0);  // Reserve space for null terminator
+    if (bytesReceived <= 0) {
+        std::cerr << "Failed to receive response or connection closed" << std::endl;
+        return false;
+    }
+
+    // Null-terminate the response to safely convert to a string
+    response[bytesReceived] = '\0';
+    std::string verificationResponse = response;
+
+    // Check if the response is "Verified"
+    if (verificationResponse == "Login successful") {
+        return true;
+    } else {
+        std::cerr << "Verification failed: " << verificationResponse << std::endl;
+        return false;
+    }
+}
+
+void Client::setEmail(const std::string& email) {
+    mailID = email;
+}
+
+std::string Client::getEmail() {
+    return mailID;
+}
+
+SOCKET Client::getClientSocket() {
+    return clientSocket;
 }
