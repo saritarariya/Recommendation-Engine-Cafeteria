@@ -22,7 +22,7 @@ private:
     string username = "root";
     string password = "Madhusakshi@123";
     string database = "CafeteriaProjectDatabase";
-    Connection *databaseConnection;
+    Connection *databaseConnection = NULL;
 
 public:
     bool connect();

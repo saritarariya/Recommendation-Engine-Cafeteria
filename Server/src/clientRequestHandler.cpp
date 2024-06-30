@@ -11,7 +11,16 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
         {
             std::cout << "Is control reached here 2\n";
             std::string response = dbManager.showAllMenuItems(); // Implement this method to return all menu items as a string
-            send(clientSocket, response.c_str(), response.size(), 0);
+            int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
+
+            if (bytesSent == SOCKET_ERROR)
+            {
+                std::cerr << "Failed to send response to client. Error code: " << WSAGetLastError() << std::endl;
+            }
+            else
+            {
+                std::cout << "Response sent successfully. Bytes sent: " << bytesSent << std::endl;
+            }
         }
         else if (request.substr(0, 10) == "loginUser:")
         {

@@ -14,7 +14,7 @@ protected:
         if(client->getClientSocket() == INVALID_SOCKET) {
             std::cout<<"I am not connected to server\n";
         }
-        if (send(client->getClientSocket(), request.c_str(), request.size(), 0) == -1)
+        if(send(client->getClientSocket(), request.c_str(), request.size(), 0) == -1)
           {
             std::cout<<"failed to send your request to server.\n";
             std::cout<<WSAGetLastError();
@@ -25,14 +25,19 @@ protected:
     }
 
     std::string receiveResponse(Client *client) {
-        char buffer[256];
-        int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
-        if (bytesReceived > 0) {
-            buffer[bytesReceived] = '\0';
-            return std::string(buffer);
-        }
-        return "";
+    char buffer[3000];
+    int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
+    
+    if (bytesReceived > 0) {
+        buffer[bytesReceived] = '\0';
+        std::cout << "Response received: " << buffer << std::endl;  // Log the response content
+        return std::string(buffer);
+    } else {
+        std::cout << "No response received or connection closed. Error code: " << WSAGetLastError() << std::endl;  // Log if no response is received
     }
+
+    return "";
+}
 };
 
 #endif

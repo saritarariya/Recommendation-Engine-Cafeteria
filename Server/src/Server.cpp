@@ -1,7 +1,6 @@
 #include "Server.h"
 
 Server::Server() : serverSocket(INVALID_SOCKET), clientSocket(INVALID_SOCKET), countOfClients(0) {}
-
 Server::~Server() {
     closeServer();
     

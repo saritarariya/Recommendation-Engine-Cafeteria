@@ -6,26 +6,31 @@
 
 bool DatabaseManager::connect()
 {
-    try
+    if (databaseConnection == NULL)
     {
-        mysql::MySQL_Driver *driver = mysql::get_mysql_driver_instance();
-        databaseConnection = driver->connect(DatabaseServer, username, password);
-        if (databaseConnection)
+        try
         {
-            databaseConnection->setSchema(database);
-            return true;
+            mysql::MySQL_Driver *driver = mysql::get_mysql_driver_instance();
+            databaseConnection = driver->connect(DatabaseServer, username, password);
+            if (databaseConnection)
+            {
+                databaseConnection->setSchema(database);
+                return true;
+            }
+            else
+            {
+                cerr << "Failed to connect to database." << endl;
+                return false;
+            }
         }
-        else
+        catch (SQLException &e)
         {
-            cerr << "Failed to connect to database." << endl;
+            cerr << "SQL Error: " << e.what() << endl;
             return false;
         }
+        return true;
     }
-    catch (SQLException &e)
-    {
-        cerr << "SQL Error: " << e.what() << endl;
-        return false;
-    }
+    return true;
 }
 
 bool DatabaseManager::addMenuItem(const string &name, const string &description, double price, const string &category, bool availability)
@@ -181,7 +186,6 @@ std::string DatabaseManager::showAllMenuItems()
         response << "-------------------------------------------------\n";
         response << setw(20) << left << "Name" << setw(50) << left << "Description" << setw(10) << left << "Price" << setw(15) << left << "Category" << setw(15) << left << "Availability" << "\n";
         response << "-------------------------------------------------\n";
-
         while (res->next())
         {
             string name = res->getString("name");
@@ -205,5 +209,6 @@ std::string DatabaseManager::showAllMenuItems()
         delete stmt;
         return response.str();
     }
+    cout << response.str() << std::endl;
     return response.str();
 }
