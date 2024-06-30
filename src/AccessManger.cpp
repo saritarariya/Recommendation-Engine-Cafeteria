@@ -42,7 +42,7 @@ void AccessManager::grantEmployeeAccess(const std::string& email) {
 void AccessManager::grantChefAccess(const std::string& email) {
     std::cout << "Granting chef access to " << email << std::endl;
     Chef* chef = new Chef(client);
-    chef->performRoleFunctions();
+    chef->getFoodItemsToRollOut();
     delete chef;
 }
 

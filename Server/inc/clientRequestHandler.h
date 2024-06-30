@@ -3,6 +3,8 @@
 
 #include <string>
 #include <winsock2.h>
+#include <vector>
+#include <tuple>
 #include "DatabaseManager.h"
 
 class ClientRequestHandler

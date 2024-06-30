@@ -85,6 +85,32 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
             std::string response = success ? "Menu item updated successfully" : "Failed to update menu item";
             send(clientSocket, response.c_str(), response.size(), 0);
         }
+        else if (request == "getAllFeedbacks:")
+        {
+            
+            std::vector<std::tuple<int, std::string, std::string, int, std::string, std::string>> feedbacks = dbManager.getAllFeedbacks();
+
+            std::string response;
+            for (const auto& feedback : feedbacks)
+            {
+                response += std::to_string(std::get<0>(feedback)) + "\n";
+                response += std::get<1>(feedback) + "\n";
+                response += std::get<2>(feedback) + "\n"; 
+                response += std::to_string(std::get<3>(feedback)) + "\n";
+                response += std::get<4>(feedback) + "\n"; 
+                response += std::get<5>(feedback) + "\n"; 
+            }
+
+            int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
+            if (bytesSent == SOCKET_ERROR)
+            {
+                std::cerr << "Failed to send response to client. Error code: " << WSAGetLastError() << std::endl;
+            }
+            else
+            {
+                std::cout << "Response sent successfully. Bytes sent: " << bytesSent << std::endl;
+            }
+        }
         else
         {
             std::string response = "Unknown request";

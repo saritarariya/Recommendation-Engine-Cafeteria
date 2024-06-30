@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <sstream>
 #include <stdlib.h>
+#include <tuple>
+#include <vector>
 #include <mysql_driver.h>
 #include <mysql_connection.h>
 #include <cppconn/statement.h>
@@ -31,6 +33,8 @@ public:
     bool deleteMenuItem(const string &name);
     bool updateMenuItem(const string &name, double price, bool availability);
     std::string showAllMenuItems();
+    std::vector<tuple<int, string, string, int, string, string>>getAllFeedbacks();
+    bool sendFeedback(const string &menuItemName, const string &feedbackDate, int rating, const string &comments, const string &email);
 };
 
 #endif // DATABASE_MANAGER_H

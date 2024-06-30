@@ -142,7 +142,9 @@
     <ClInclude Include="Inc\Chef.h" />
     <ClInclude Include="Inc\Client.h" />
     <ClInclude Include="Inc\Employee.h" />
+    <ClInclude Include="Inc\Feedback.h" />
     <ClInclude Include="Inc\Food.h" />
+    <ClInclude Include="Inc\RecommendationEngine.h" />
     <ClInclude Include="Inc\User.h" />
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +153,9 @@
     <ClCompile Include="src\Chef.cpp" />
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Employeee.cpp" />
+    <ClCompile Include="src\Feedback.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\RecommendationEngine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
