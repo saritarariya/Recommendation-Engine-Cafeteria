@@ -26,9 +26,9 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
             std::string response = loginSuccess ? "Login successful" : "Login failed";
             send(clientSocket, response.c_str(), response.size(), 0);
         }
-        else if (request.substr(0, 13) == "addMenuItem:")
+        else if (request.substr(0, 12) == "addMenuItem:")
         {
-            std::string remaining = request.substr(13);
+            std::string remaining = request.substr(12);
 
             size_t pos = 0;
             std::string delimiter = "\n";
@@ -50,7 +50,7 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
             remaining.erase(0, pos + delimiter.length());
 
             bool availability = std::stoi(remaining);
-
+       
             bool success = dbManager.addMenuItem(name, description, price, category, availability);
 
             std::string response = success ? "Menu item added successfully" : "Failed to add menu item";
@@ -59,14 +59,14 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
 
         else if (request.substr(0, 15) == "deleteMenuItem:")
         {
-            std::string name = request.substr(15); // Extract the name from the request string
+            std::string name = request.substr(15);
             bool success = dbManager.deleteMenuItem(name);
             std::string response = success ? "Menu item deleted successfully" : "Failed to delete menu item";
             send(clientSocket, response.c_str(), response.size(), 0);
         }
-        else if (request.substr(0, 16) == "updateMenuItem:")
+        else if (request.substr(0, 15) == "updateMenuItem:")
         {
-            std::string remaining = request.substr(16);
+            std::string remaining = request.substr(15);
             size_t pos = 0;
             std::string delimiter = "\n";
 

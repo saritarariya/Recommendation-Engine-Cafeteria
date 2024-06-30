@@ -160,8 +160,8 @@ void Admin::updateMenuItem()
     std::cout << "Is the menu item available? (1 for Yes, 0 for No): ";
     std::cin >> availability;
 
-    std::string request = "updateMenuItem " + name + "\n" + std::to_string(price) + "\n" + (availability ? "1" : "0");
-
+    std::string request = "updateMenuItem:" + name + "\n" + std::to_string(price) + "\n" + (availability ? "1" : "0");
+     
     if(this->client->clientSocket == INVALID_SOCKET) {
         std::cout<<"connection not valid\n";
     }
