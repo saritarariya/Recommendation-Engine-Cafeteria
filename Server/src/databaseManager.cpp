@@ -55,7 +55,7 @@ bool DatabaseManager::addMenuItem(const string &name, const string &description,
 
         int updateCount = pstmt->executeUpdate();
         delete pstmt;
-        return updateCount > 0; // Return true if insertion was successful
+        return updateCount > 0;
     }
     catch (SQLException &e)
     {
@@ -83,7 +83,7 @@ bool DatabaseManager::deleteMenuItem(const string &name)
 
         int updateCount = pstmt->executeUpdate();
         delete pstmt;
-        return updateCount > 0; // Return true if deletion was successful
+        return updateCount > 0; 
     }
     catch (SQLException &e)
     {
@@ -113,7 +113,7 @@ bool DatabaseManager::updateMenuItem(const string &name, double price, bool avai
 
         int updateCount = pstmt->executeUpdate();
         delete pstmt;
-        return updateCount > 0; // Return true if update was successful
+        return updateCount > 0;
     }
     catch (SQLException &e)
     {
@@ -147,13 +147,13 @@ bool DatabaseManager::loginUser(const string &email)
             delete res;
             delete pstmt;
             std::cout << email << "Joined" << "\n";
-            return true; // Email exists in the database
+            return true; 
         }
         else
         {
             delete res;
             delete pstmt;
-            return false; // Email does not exist in the database
+            return false; 
         }
     }
     catch (SQLException &e)
@@ -198,7 +198,6 @@ std::string DatabaseManager::showAllMenuItems()
         }
         response << "-------------------------------------------------\n";
 
-        // Send the response string to the client
         delete res;
         delete stmt;
     }
@@ -209,6 +208,5 @@ std::string DatabaseManager::showAllMenuItems()
         delete stmt;
         return response.str();
     }
-    cout << response.str() << std::endl;
     return response.str();
 }

@@ -6,13 +6,10 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
 {
     if (dbManager.connect())
     {
-        std::cout << "Is control reached here 1\n";
         if (request == "showAllMenuItems")
         {
-            std::cout << "Is control reached here 2\n";
-            std::string response = dbManager.showAllMenuItems(); // Implement this method to return all menu items as a string
+            std::string response = dbManager.showAllMenuItems();
             int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
-
             if (bytesSent == SOCKET_ERROR)
             {
                 std::cerr << "Failed to send response to client. Error code: " << WSAGetLastError() << std::endl;
@@ -96,34 +93,3 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
     }
 }
 
-std::string ClientRequestHandler::receiveEmail(const SOCKET clientSocket)
-{
-    char buffer[100];
-    int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-    buffer[bytesReceived] = '\0';
-    return std::string(buffer);
-}
-
-std::string ClientRequestHandler::receiveString(const SOCKET clientSocket)
-{
-    char buffer[256];
-    int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-    buffer[bytesReceived] = '\0';
-    return std::string(buffer);
-}
-
-double ClientRequestHandler::receiveDouble(const SOCKET clientSocket)
-{
-    char buffer[64];
-    int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-    buffer[bytesReceived] = '\0';
-    return std::stod(buffer);
-}
-
-bool ClientRequestHandler::receiveBool(const SOCKET clientSocket)
-{
-    char buffer[5];
-    int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-    buffer[bytesReceived] = '\0';
-    return (std::string(buffer) == "true");
-}

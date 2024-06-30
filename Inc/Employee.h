@@ -9,12 +9,11 @@
 class Employee : public User
 {   
     public:
-    Client*client;
+    Employee(Client* client) : User(client) {}
     // std::string provideFeedback();
     // std::string chooseFoodItemsForNextDay();
     // int provideRating(); 
     // std::string getFoodItemsForNextDay();
-    Employee(Client* client);
     void performRoleFunctions();
     // void performRoleFunctions() override {
     //     // Define employee-specific functions here

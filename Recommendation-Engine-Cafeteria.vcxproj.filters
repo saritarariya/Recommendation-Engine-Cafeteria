@@ -56,7 +56,7 @@
     <ClCompile Include="src\Employeee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\clientmain.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

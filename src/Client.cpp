@@ -14,15 +14,7 @@ void Client::handleCtrlC(int signal)
     
 int Client::createSocket()
 {
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0)
-    {
-        std::cerr << "WSAStartup failed: " << result << std::endl;
-        return 1;
-    }
-
-    this->clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (clientSocket == INVALID_SOCKET)
     {
         std::cerr << "Error at socket(): " << WSAGetLastError() << std::endl;
@@ -55,10 +47,9 @@ void Client::assignClientAddress(const std::string &ipAddress, int port)
 }
 
 
-
-
 bool Client::connectToServer()
 {
+    int connectionStatus = false;
     WSADATA wsaData;
     int wsaResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaResult != 0) {
@@ -68,40 +59,39 @@ bool Client::connectToServer()
     try
     {
         assignClientAddress("127.0.0.1", 8080);
-        createSocket();
-        connectSocket();
+        connectionStatus = createSocket();
+        connectionStatus = connectSocket();
     }
     catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
         return 0;
 	}
-    return 1;
+    if( connectionStatus == 0) 
+    {
+        return true;
+    }
 }
 
 bool Client::verifyUser() {
-    // Construct the request string with "login_user" followed by the email ID
-    std::string request = "loginUser:" + mailID + '\0';  // Ensure null-termination
 
-    // Send the request string to the server
+    std::string request = "loginUser:" + mailID + '\0';
+
     if (send(clientSocket, request.c_str(), request.size(), 0) == -1) {
         std::cerr << "Failed to send request" << std::endl;
         return false;
     }
 
-    // Prepare buffer for receiving the response
     char response[MAX_LEN];
-    int bytesReceived = recv(clientSocket, response, MAX_LEN - 1, 0);  // Reserve space for null terminator
+    int bytesReceived = recv(clientSocket, response, MAX_LEN - 1, 0);
     if (bytesReceived <= 0) {
         std::cerr << "Failed to receive response or connection closed" << std::endl;
         return false;
     }
 
-    // Null-terminate the response to safely convert to a string
     response[bytesReceived] = '\0';
     std::string verificationResponse = response;
 
-    // Check if the response is "Verified"
     if (verificationResponse == "Login successful") {
         return true;
     } else {

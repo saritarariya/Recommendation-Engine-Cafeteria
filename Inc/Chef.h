@@ -8,22 +8,14 @@
 
 class Chef : public User
 {
-    public:
-    Client*client;
-    Chef(Client* client);
+
+private:
     // std::string rollOutFoodItems();
-    // std::string getMonthlyReport(std::string foodItem);
     // std::string getLastDayVoting();
     // std::string getFoodItemsToRollOut();
+public:
+    Chef(Client *client) : User(client) {}
     void performRoleFunctions();
-    // void performRoleFunctions() override {
-    //     // Define chef-specific functions here
-    //     std::cout << "Chef role functions" << std::endl;
-    // }
-
-    // void chefFunctions() {
-    //     // Implement chef-specific functions using sendRequest and receiveResponse
-    // }
 };
 
 #endif

@@ -6,38 +6,34 @@
 
 class User {
 public:
+    User(Client* client) : client(client) {}
     virtual ~User() {}
     virtual void performRoleFunctions() = 0;
 
 protected:
-    bool sendRequest(const std::string& request , Client *client) {
-        if(client->getClientSocket() == INVALID_SOCKET) {
-            std::cout<<"I am not connected to server\n";
-        }
-        if(send(client->getClientSocket(), request.c_str(), request.size(), 0) == -1)
-          {
-            std::cout<<"failed to send your request to server.\n";
-            std::cout<<WSAGetLastError();
+    Client* client;
+
+    bool sendRequest(const std::string& request) {
+        if (send(client->getClientSocket(), request.c_str(), request.size(), 0) == -1) {
+            std::cout << "Failed to send your request to server. Error code: " << WSAGetLastError() << std::endl;
             return false;
-          }
+        }
+        std::cout << "Request sent successfully\n";
         return true;
-        std::cout <<"request sent sucessfully\n";
     }
 
-    std::string receiveResponse(Client *client) {
-    char buffer[3000];
-    int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
-    
-    if (bytesReceived > 0) {
-        buffer[bytesReceived] = '\0';
-        std::cout << "Response received: " << buffer << std::endl;  // Log the response content
-        return std::string(buffer);
-    } else {
-        std::cout << "No response received or connection closed. Error code: " << WSAGetLastError() << std::endl;  // Log if no response is received
-    }
+    std::string receiveResponse() {
+        char buffer[9000];
+        int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
 
-    return "";
-}
+        if (bytesReceived > 0) {
+            buffer[bytesReceived] = '\0';
+            return std::string(buffer);
+        } else {
+            std::cout << "No response received or connection closed. Error code: " << WSAGetLastError() << std::endl;  // Log if no response is received
+        }
+        return "";
+    }
 };
 
 #endif

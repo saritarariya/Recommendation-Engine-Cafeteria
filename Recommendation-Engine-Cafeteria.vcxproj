@@ -150,8 +150,8 @@
     <ClCompile Include="src\Admin.cpp" />
     <ClCompile Include="src\Chef.cpp" />
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\clientmain.cpp" />
     <ClCompile Include="src\Employeee.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

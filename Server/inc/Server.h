@@ -29,7 +29,7 @@ private:
     std::vector<ClientsData> collectionOfClients;
     std::mutex clientsMutex;
     int countOfClients;
-    void handleClient(const SOCKET clientSocket, const int id);
+    void handleClient(const SOCKET clientSocket);
     void endConnection(int id);
     void closeServer();
 public:

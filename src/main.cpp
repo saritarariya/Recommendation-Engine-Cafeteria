@@ -13,14 +13,20 @@ int main()
         std::cout << "Enter email: ";
         std::cin >> email;
         client.setEmail(email);
-        if(client.verifyUser()) {
-            std::cout<<"user login successfull\n";
-            AccessManager *accessManager = new  AccessManager(&client);
+        if (client.verifyUser())
+        {
+            std::cout << "user login successfull\n";
+            AccessManager *accessManager = new AccessManager(&client);
             accessManager->grantAccess(email);
         }
-        else {
-            std::cout<<"user does not exist\n";
+        else
+        {
+            std::cout << "user does not exist\n";
         }
+    }
+    else
+    {
+        std::cout << "Unable to connect to server\n";
     }
     return 0;
 }

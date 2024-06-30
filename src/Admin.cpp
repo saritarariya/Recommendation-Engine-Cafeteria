@@ -1,9 +1,5 @@
 #include "Admin.h"
 
-Admin::Admin(Client*client) 
-{
-    this->client = client;
-}
 void Admin::showOptions()
 {
     std::cout << "\nAdmin Menu:" << std::endl;
@@ -87,9 +83,9 @@ void Admin::addMenuItem()
 
     std::string request = "addMenuItem:" + name + "\n" + description + "\n" + std::to_string(price) + "\n" + category + "\n" + std::to_string(availability) + '\0';
 
-    sendRequest(request, this->client);
+    sendRequest(request);
 
-    std::string response = receiveResponse(this->client);
+    std::string response = receiveResponse();
     if (response  == "Menu item added successfully")
     {
         std::cout << "Menu item " << name << " added successfully!" << std::endl;
@@ -139,8 +135,8 @@ void Admin::deleteMenuItem()
     std::cin.ignore();
     std::getline(std::cin, name);
     std::string request = "deleteMenuItem:" + name;
-    sendRequest(request, this->client);
-    std::string response = receiveResponse(this->client);
+    sendRequest(request);
+    std::string response = receiveResponse();
     if (response == "Menu item deleted successfully") {
         std::cout << "Menu item '" << name << "' deleted successfully!" << std::endl;
     } else {
@@ -155,7 +151,7 @@ void Admin::updateMenuItem()
     bool availability;
 
     std::cout << "Enter the name of the menu item to update: ";
-    std::cin.ignore(); // Ignore the newline character left in the buffer
+    std::cin.ignore(); 
     std::getline(std::cin, name);
 
     std::cout << "Enter the new price of the menu item: ";
@@ -164,25 +160,22 @@ void Admin::updateMenuItem()
     std::cout << "Is the menu item available? (1 for Yes, 0 for No): ";
     std::cin >> availability;
 
-    // Form the request to send to the server in camelCase
     std::string request = "updateMenuItem " + name + "\n" + std::to_string(price) + "\n" + (availability ? "1" : "0");
 
-    // Send the request to the server
     if(this->client->clientSocket == INVALID_SOCKET) {
         std::cout<<"connection not valid\n";
     }
-    sendRequest(request , this->client);
+    sendRequest(request);
 
-    // Receive and process response from the server
-    std::string response = receiveResponse(this->client);
+    std::string response = receiveResponse();
     std::cout << "Server response: " << response << std::endl;
 }
 
 void Admin::viewAllMenuItems()
 {
     std::string request = "showAllMenuItems";
-    sendRequest(request , this->client);
-    std::string response = receiveResponse(this->client);
+    sendRequest(request);
+    std::string response = receiveResponse();
     std::cout << "Server response:" << std::endl;
     std::cout << response << std::endl;
 }

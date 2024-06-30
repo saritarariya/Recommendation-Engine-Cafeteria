@@ -1,9 +1,5 @@
 #include "Employee.h"
 
-Employee::Employee(Client*client) {
-  this->client = client;
-}
-
 void Employee::performRoleFunctions() {
     std::cout << "Please choose an operation:" << std::endl;
     std::cout << "1. Provide Feedback" << std::endl;
