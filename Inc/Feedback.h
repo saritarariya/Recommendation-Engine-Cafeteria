@@ -6,23 +6,23 @@
 class Feedback {
 private:
     int feedbackId;
-    std::string menuItemName;
-    std::string feedback_date;
+    int userId;
+    int foodItemId;
     int rating;
-    std::string comments;
-    std::string email;
+    std::string comment;
+    std::string createdAt;
 
 public:
-    Feedback(int id, const std::string& name, const std::string& date, int rate, const std::string& com, const std::string& mail);
+    Feedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt);
 
     int getFeedbackId() const;
-    std::string getMenuItemName() const;
-    std::string getFeedbackDate() const;
+    int getUserId() const;
+    int getFoodItemId() const;
     int getRating() const;
-    std::string getComments() const;
-    std::string getEmail() const;
+    std::string getComment() const;
+    std::string getCreatedAt() const;
 
     int calculateSentimentScore() const;
 };
 
-#endif 
+#endif // FEEDBACK_H

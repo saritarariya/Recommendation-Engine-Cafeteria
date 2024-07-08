@@ -20,6 +20,7 @@ private:
     struct sockaddr_in client;
     int portNumber;
     std::string mailID;
+    std::string password;
 
 public:
     SOCKET clientSocket;
@@ -37,6 +38,7 @@ public:
     void setEmail(const std::string &email);
     std::string getEmail();
     SOCKET getClientSocket();
+    void setPassword(const std::string& password);
 };
 
 #endif

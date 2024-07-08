@@ -15,9 +15,10 @@
 
 struct ClientsData
 {
-    int id;
+    int clientCount;
     SOCKET socket;
     std::string email;
+    int clientID;
 };
 
 class Server

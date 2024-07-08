@@ -49,8 +49,10 @@ void Server::closeServer()
     WSACleanup();
 }
 
-bool Server::handleMultipleClients() {
-    if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+bool Server::handleMultipleClients()
+{
+    if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR)
+    {
         std::cerr << "Listen failed: " << WSAGetLastError() << std::endl;
         closesocket(serverSocket);
         WSACleanup();
@@ -59,10 +61,12 @@ bool Server::handleMultipleClients() {
 
     std::cout << "Listening on socket..." << std::endl;
 
-    while (true) {
+    while (true)
+    {
         int clientLen = sizeof(client);
-        SOCKET clientSocket = accept(serverSocket, (struct sockaddr*)&client, &clientLen);
-        if (clientSocket == INVALID_SOCKET) {
+        SOCKET clientSocket = accept(serverSocket, (struct sockaddr *)&client, &clientLen);
+        if (clientSocket == INVALID_SOCKET)
+        {
             std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
             continue;
         }
@@ -106,6 +110,7 @@ int Server::listenFunction()
 
 void Server::handleClient(SOCKET clientSocket)
 {
+    int userId;
     DatabaseManager databaseManager;
     ClientRequestHandler requestHandler(databaseManager);
     char buffer[256];
@@ -124,21 +129,31 @@ void Server::handleClient(SOCKET clientSocket)
 
         if (request.substr(0, 10) == "loginUser:")
         {
-            std::string email = request.substr(10);
-            databaseManager.connect();
-            bool loginSuccess = databaseManager.loginUser(email);
-            std::string response = loginSuccess ? "Login successful" : "Login failed";
+            std::string credentials = request.substr(10);
+            size_t commaPos = credentials.find(',');
 
-            send(clientSocket, response.c_str(), response.size(), 0);
-
-            if (loginSuccess)
+            if (commaPos != std::string::npos)
             {
-                std::lock_guard<std::mutex>lock(clientsMutex);
-                ClientsData clientData;
-                clientData.id = countOfClients++;
-                clientData.socket = clientSocket;
-                clientData.email = email; 
-                collectionOfClients.push_back(clientData);
+                std::string email = credentials.substr(0, commaPos);
+                std::string password = credentials.substr(commaPos + 1);
+
+                databaseManager.connect();
+                userId = databaseManager.loginUser(email, password);
+                bool loginSuccess = (userId != -1);
+                std::string response = loginSuccess ? "Login successful" : "Login failed";
+
+                send(clientSocket, response.c_str(), response.size(), 0);
+
+                if (loginSuccess)
+                {
+                    std::lock_guard<std::mutex> lock(clientsMutex);
+                    ClientsData clientData;
+                    clientData.clientCount = countOfClients++;
+                    clientData.socket = clientSocket;
+                    clientData.email = email;
+                    clientData.clientID = userId;
+                    collectionOfClients.push_back(clientData);
+                }
             }
         }
         else
@@ -150,7 +165,7 @@ void Server::handleClient(SOCKET clientSocket)
 
             if (it != collectionOfClients.end())
             {
-                requestHandler.processRequest(request, clientSocket, it->id);
+                requestHandler.processRequest(request, clientSocket, it->clientID);
             }
             else
             {
@@ -166,7 +181,7 @@ void Server::endConnection(int id)
     std::lock_guard<std::mutex> lock(clientsMutex);
     auto it = std::find_if(collectionOfClients.begin(), collectionOfClients.end(),
                            [id](const ClientsData &data)
-                           { return data.id == id; });
+                           { return data.clientID == id; });
     if (it != collectionOfClients.end())
     {
         std::cout << "Client " << id << " (" << it->email << ") left the server." << std::endl;

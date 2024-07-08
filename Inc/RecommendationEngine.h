@@ -12,9 +12,10 @@ private:
     std::vector<Feedback> feedbacks;
 
 public:
-    void addFeedback(int id, const std::string& name, const std::string& date, int rate, const std::string& com, const std::string& mail);
-    std::vector<std::string> getTopFoodItems() const;
+    void addFeedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt);
+    std::vector<int> getTopFoodItems() const;
     void parseAndAddFeedbacks(const std::string& feedbackData);
+    void performRoleFunctions();
 };
 
 #endif

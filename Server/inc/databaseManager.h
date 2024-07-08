@@ -25,16 +25,22 @@ private:
     string password = "Madhusakshi@123";
     string database = "CafeteriaProjectDatabase";
     Connection *databaseConnection = NULL;
-
+    
 public:
     bool connect();
-    bool loginUser(const string &email);
+    int loginUser(const string &email, const string &password);
     bool addMenuItem(const string &name, const string &description, double price, const string &category, bool availability);
     bool deleteMenuItem(const string &name);
     bool updateMenuItem(const string &name, double price, bool availability);
     std::string showAllMenuItems();
-    std::vector<tuple<int, string, string, int, string, string>>getAllFeedbacks();
+    std::vector<std::tuple<int, int, int, int, std::string, std::string>> getAllFeedbacks();
     bool sendFeedback(const string &menuItemName, const string &feedbackDate, int rating, const string &comments, const string &email);
+    bool storeRolledOutFoodItems(const std::vector<std::string> &foodItems , int id);
+    std::vector<std::string> getNotifications();
+    bool storeFeedback(int userId, int foodItemId, int rating, const std::string &comment);
+    bool storeVote(int userId, int foodItemId, int voteCount);
+    int getFoodItemId(const std::string &foodItem);
+    int getVotesForFoodItem(int foodItemId);
 };
 
 #endif // DATABASE_MANAGER_H

@@ -2,7 +2,7 @@
 #include <sstream>
 #include <unordered_set>
 
-
+// Define the positive and negative words for sentiment analysis
 std::unordered_set<std::string> positive_words = {
     "delicious", "tasty", "flavorful", "perfect", "excellent", "good"
 };
@@ -11,36 +11,36 @@ std::unordered_set<std::string> negative_words = {
     "bland", "soggy", "oily", "overcooked", "dry", "bitter"
 };
 
-Feedback::Feedback(int id, const std::string& name, const std::string& date, int rate, const std::string& com, const std::string& mail)
-    : feedbackId(id), menuItemName(name), feedback_date(date), rating(rate), comments(com), email(mail) {}
+Feedback::Feedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt)
+    : feedbackId(feedbackId), userId(userId), foodItemId(foodItemId), rating(rating), comment(comment), createdAt(createdAt) {}
 
 int Feedback::getFeedbackId() const {
     return feedbackId;
 }
 
-std::string Feedback::getMenuItemName() const {
-    return menuItemName;
+int Feedback::getUserId() const {
+    return userId;
 }
 
-std::string Feedback::getFeedbackDate() const {
-    return feedback_date;
+int Feedback::getFoodItemId() const {
+    return foodItemId;
 }
 
 int Feedback::getRating() const {
     return rating;
 }
 
-std::string Feedback::getComments() const {
-    return comments;
+std::string Feedback::getComment() const {
+    return comment;
 }
 
-std::string Feedback::getEmail() const {
-    return email;
+std::string Feedback::getCreatedAt() const {
+    return createdAt;
 }
 
 int Feedback::calculateSentimentScore() const {
     int sentiment_score = 0;
-    std::istringstream iss(comments);
+    std::istringstream iss(comment);
     std::string word;
     while (iss >> word) {
         if (positive_words.count(word)) {

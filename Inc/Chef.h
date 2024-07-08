@@ -10,14 +10,15 @@
 
 class Chef : public User
 {
-
-private:
-    // std::string rollOutFoodItems();
-    // std::string getLastDayVoting();
 public:
     Chef(Client *client) : User(client) {}
     void performRoleFunctions();
-    std::vector<std::string> getFoodItemsToRollOut();
+    std::vector<int> getFoodItemsToRollOut();
+    void chooseFoodItemsForNextDay();
+    void viewVotes();
+    void viewNotifications();
+    void viewAllMenuItems();
+    std::string getMenuItemName(const int &foodItemId);
 };
 
 #endif

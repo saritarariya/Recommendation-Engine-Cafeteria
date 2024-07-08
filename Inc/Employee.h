@@ -3,6 +3,8 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <vector>
 #include "User.h"
 #include "Client.h"
 
@@ -10,18 +12,11 @@ class Employee : public User
 {   
     public:
     Employee(Client* client) : User(client) {}
-    // std::string provideFeedback();
-    // std::string chooseFoodItemsForNextDay();
-    // int provideRating(); 
+    void voteForFoodItems();
     // std::string getFoodItemsForNextDay();
     void performRoleFunctions();
-    // void performRoleFunctions() override {
-    //     // Define employee-specific functions here
-    //     std::cout << "Employee role functions" << std::endl;
-    // }
-
-    // void employeeFunctions() {
-    //     // Implement employee-specific functions using sendRequest and receiveResponse
-    // }
+    void viewNotifications();
+    void provideFeedback();
+    void viewAllMenuItems();
 };
 #endif

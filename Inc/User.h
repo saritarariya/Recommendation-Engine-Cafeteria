@@ -23,7 +23,7 @@ protected:
     }
 
     std::string receiveResponse() {
-        char buffer[100000];
+        char buffer[10000];
         int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
 
         if (bytesReceived > 0) {

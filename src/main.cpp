@@ -9,10 +9,13 @@ int main()
     {
         std::cout << "********** Recommendation-Engine-Cafeteria **********" << std::endl;
         std::cout << "=== Login Panel ===" << std::endl;
-        std::string email;
-        std::cout << "Enter email: ";
+        std::string email,password;
+        std::cout << "Enter email:-";
         std::cin >> email;
+        std::cout << "Enter password:-";
+        std::cin >> password;
         client.setEmail(email);
+        client.setPassword(password);
         if (client.verifyUser())
         {
             std::cout << "user login successfull\n";

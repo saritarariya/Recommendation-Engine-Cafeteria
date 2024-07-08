@@ -75,7 +75,7 @@ bool Client::connectToServer()
 
 bool Client::verifyUser() {
 
-    std::string request = "loginUser:" + mailID + '\0';
+    std::string request = "loginUser:" + mailID + ',' + password + '\0';
 
     if (send(clientSocket, request.c_str(), request.size(), 0) == -1) {
         std::cerr << "Failed to send request" << std::endl;
@@ -102,6 +102,10 @@ bool Client::verifyUser() {
 
 void Client::setEmail(const std::string& email) {
     mailID = email;
+}
+
+void Client::setPassword(const std::string& password) {
+    this->password = password;
 }
 
 std::string Client::getEmail() {

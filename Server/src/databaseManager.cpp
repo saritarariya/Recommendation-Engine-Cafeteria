@@ -45,7 +45,7 @@ bool DatabaseManager::addMenuItem(const string &name, const string &description,
 
     try
     {
-        string query = "INSERT INTO menu_items (name, description, price, category, availability) VALUES (?, ?, ?, ?, ?)";
+        string query = "INSERT INTO FoodItems (FoodItemName, description, price, category, availability) VALUES (?, ?, ?, ?, ?)";
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setString(1, name);
         pstmt->setString(2, description);
@@ -65,7 +65,7 @@ bool DatabaseManager::addMenuItem(const string &name, const string &description,
     }
 }
 
-bool DatabaseManager::deleteMenuItem(const string &name)
+bool DatabaseManager::deleteMenuItem(const string &FoodItemName)
 {
     if (!databaseConnection)
     {
@@ -77,9 +77,9 @@ bool DatabaseManager::deleteMenuItem(const string &name)
 
     try
     {
-        string query = "DELETE FROM menu_items WHERE name = ?";
+        string query = "DELETE FROM FoodItems WHERE FoodItemName = ?";
         pstmt = databaseConnection->prepareStatement(query);
-        pstmt->setString(1, name);
+        pstmt->setString(1, FoodItemName);
 
         int updateCount = pstmt->executeUpdate();
         delete pstmt;
@@ -93,7 +93,7 @@ bool DatabaseManager::deleteMenuItem(const string &name)
     }
 }
 
-bool DatabaseManager::updateMenuItem(const string &name, double price, bool availability)
+bool DatabaseManager::updateMenuItem(const string &FoodItemName, double price, bool availability)
 {
     if (!databaseConnection)
     {
@@ -105,11 +105,11 @@ bool DatabaseManager::updateMenuItem(const string &name, double price, bool avai
 
     try
     {
-        string query = "UPDATE menu_items SET price = ?, availability = ? WHERE name = ?";
+        string query = "UPDATE FoodItems SET price = ?, availability = ? WHERE FoodItemName = ?";
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setDouble(1, price);
         pstmt->setBoolean(2, availability);
-        pstmt->setString(3, name);
+        pstmt->setString(3, FoodItemName);
 
         int updateCount = pstmt->executeUpdate();
         delete pstmt;
@@ -123,8 +123,9 @@ bool DatabaseManager::updateMenuItem(const string &name, double price, bool avai
     }
 }
 
-bool DatabaseManager::loginUser(const string &email)
+int DatabaseManager::loginUser(const string &email, const string &password)
 {
+    int userId = -1;
     if (!databaseConnection)
     {
         cerr << "Not connected to database." << endl;
@@ -136,24 +137,26 @@ bool DatabaseManager::loginUser(const string &email)
 
     try
     {
-        string query = "SELECT * FROM users WHERE email = ?";
+        string query = "SELECT * FROM users WHERE Username = ? AND Password = ?";
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setString(1, email);
+        pstmt->setString(2, password);
 
         res = pstmt->executeQuery();
 
         if (res->next())
         {
+            userId = res->getInt("UserID");
             delete res;
             delete pstmt;
-            std::cout << email << "Joined" << "\n";
-            return true;
+            std::cout << email << " Joined" << "\n";
+            return userId;
         }
         else
         {
             delete res;
             delete pstmt;
-            return false;
+            return userId;
         }
     }
     catch (SQLException &e)
@@ -161,7 +164,7 @@ bool DatabaseManager::loginUser(const string &email)
         cerr << "SQL Error: " << e.what() << endl;
         delete res;
         delete pstmt;
-        return false;
+        return userId;
     }
 }
 
@@ -178,21 +181,21 @@ std::string DatabaseManager::showAllMenuItems()
     ResultSet *res = nullptr;
     try
     {
-        string query = "SELECT * FROM menu_items";
+        string query = "SELECT * FROM FoodItems";
         stmt = databaseConnection->createStatement();
         res = stmt->executeQuery(query);
 
         response << "\nMenu Items:\n";
         response << "-------------------------------------------------\n";
-        response << setw(20) << left << "Name" << setw(50) << left << "Description" << setw(10) << left << "Price" << setw(15) << left << "Category" << setw(15) << left << "Availability" << "\n";
+        response << setw(20) << left << "FoodItemName" << setw(50) << left << "Description" << setw(10) << left << "Price" << setw(15) << left << "Category" << setw(15) << left << "Availability" << "\n";
         response << "-------------------------------------------------\n";
         while (res->next())
         {
-            string name = res->getString("name");
-            string description = res->getString("description");
-            double price = res->getDouble("price");
-            string category = res->getString("category");
-            bool availability = res->getBoolean("availability");
+            string name = res->getString("FoodItemName");
+            string description = res->getString("Description");
+            double price = res->getDouble("Price");
+            string category = res->getString("Category");
+            bool availability = res->getBoolean("Availability");
 
             response << setw(20) << left << name << setw(50) << left << description << setw(10) << left << price << setw(15) << left << category << setw(15) << left << (availability ? "Yes" : "No") << "\n";
         }
@@ -211,12 +214,10 @@ std::string DatabaseManager::showAllMenuItems()
     return response.str();
 }
 
-std::vector<tuple<int, string, string, int, string, string>> DatabaseManager::getAllFeedbacks()
-{
-    std::vector<tuple<int, string, string, int, string, string>> feedbacks;
+std::vector<std::tuple<int, int, int, int, std::string, std::string>> DatabaseManager::getAllFeedbacks() {
+    std::vector<std::tuple<int, int, int, int, std::string, std::string>> feedbacks;
 
-    if (!databaseConnection)
-    {
+    if (!databaseConnection) {
         cerr << "Not connected to database." << endl;
         return feedbacks;
     }
@@ -224,35 +225,30 @@ std::vector<tuple<int, string, string, int, string, string>> DatabaseManager::ge
     PreparedStatement *pstmt = nullptr;
     ResultSet *res = nullptr;
 
-    try
-    {
-        string query = "SELECT * FROM feedback";
+    try {
+        string query = "SELECT * FROM Feedback";
         pstmt = databaseConnection->prepareStatement(query);
 
         res = pstmt->executeQuery();
 
-        while (res->next())
-        {
-            int feedbackId = res->getInt("feedback_id");
-            string menuItemName = res->getString("menu_item_name");
-            string feedback_date = res->getString("feedback_date");
-            int rating = res->getInt("rating");
-            string comments = res->getString("comments");
-            string email = res->getString("email");
+        while (res->next()) {
+            int feedbackId = res->getInt("FeedbackID");
+            int userId = res->getInt("UserID");
+            int foodItemId = res->getInt("FoodItemID");
+            int rating = res->getInt("Rating");
+            string comment = res->getString("Comment");
+            string createdAt = res->getString("CreatedAt");
 
-            feedbacks.push_back(make_tuple(feedbackId, menuItemName, feedback_date, rating, comments, email));
+            feedbacks.push_back(make_tuple(feedbackId, userId, foodItemId, rating, comment, createdAt));
         }
 
         delete res;
         delete pstmt;
-    }
-    catch (SQLException &e)
-    {
+    } catch (SQLException &e) {
         cerr << "SQL Error: " << e.what() << endl;
         delete res;
         delete pstmt;
     }
-
     return feedbacks;
 }
 
@@ -298,3 +294,222 @@ bool DatabaseManager::sendFeedback(const string &menuItemName, const string &fee
     }
 }
 
+bool DatabaseManager::storeRolledOutFoodItems(const std::vector<std::string> &foodItems , int id)
+{
+    if (!databaseConnection)
+    {
+        cerr << "Not connected to database." << endl;
+        return false;
+    }
+
+    PreparedStatement *pstmt = nullptr;
+
+    try
+    {
+        string query = "INSERT INTO notifications (Message, SenderID) VALUES (?, ?)";
+        pstmt = databaseConnection->prepareStatement(query);
+        std::ostringstream oss;
+        for (size_t i = 0; i < foodItems.size(); ++i)
+        {
+            if (i != 0)
+                oss << ", ";
+            oss << foodItems[i];
+        }
+        std::string message = "Rolled out food items: " + oss.str();
+        std::string idStr = std::to_string(id);
+
+        pstmt->setString(1, message);
+        pstmt->setInt(2, id);
+
+        pstmt->executeUpdate();
+        delete pstmt;
+        return true;
+    }
+    catch (SQLException &e)
+    {
+        cerr << "SQL Error: " << e.what() << endl;
+        delete pstmt;
+        return false;
+    }
+}
+
+std::vector<std::string> DatabaseManager::getNotifications() {
+    std::vector<std::string> notifications;
+
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return notifications;
+    }
+
+    PreparedStatement *pstmt = nullptr;
+    ResultSet *res = nullptr;
+
+    try {
+        std::string query = "SELECT Message FROM Notifications";
+        pstmt = databaseConnection->prepareStatement(query);
+
+        res = pstmt->executeQuery();
+
+        while (res->next()) {
+            notifications.push_back(res->getString("Message"));
+        }
+
+        delete res;
+        delete pstmt;
+    } catch (SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete res;
+        delete pstmt;
+    }
+
+    return notifications;
+}
+
+bool DatabaseManager::storeFeedback(int userId, int foodItemId, int rating, const std::string &comment) {
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return false;
+    }
+
+    sql::PreparedStatement *pstmt = nullptr;
+    try {
+        std::string query = "INSERT INTO Feedback (UserID, FoodItemID, Rating, Comment) VALUES (?, ?, ?, ?)";
+        pstmt = databaseConnection->prepareStatement(query);
+        pstmt->setInt(1, userId);
+        pstmt->setInt(2, foodItemId);
+        pstmt->setInt(3, rating);
+        pstmt->setString(4, comment);
+
+        pstmt->executeUpdate();
+        delete pstmt;
+        return true;
+    } catch (sql::SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete pstmt;
+        return false;
+    }
+}
+
+bool DatabaseManager::storeVote(int userId, int foodItemId, int voteCount) {
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return false;
+    }
+
+    sql::PreparedStatement *pstmt = nullptr;
+
+    try {
+        std::string query = "INSERT INTO Votes (UserID, FoodItemID, VoteCount) VALUES (?, ?, ?)";
+        pstmt = databaseConnection->prepareStatement(query);
+        pstmt->setInt(1, userId);
+        pstmt->setInt(2, foodItemId);
+        pstmt->setInt(3, voteCount);
+
+        pstmt->executeUpdate();
+        delete pstmt;
+        return true;
+    } catch (sql::SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete pstmt;
+        return false;
+    }
+}
+
+int DatabaseManager::getFoodItemId(const std::string &foodItem) {
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return -1;
+    }
+
+    sql::PreparedStatement *pstmt = nullptr;
+    sql::ResultSet *res = nullptr;
+
+    try {
+        std::string query = "SELECT FoodItemID FROM FoodItems WHERE Name = ?";
+        pstmt = databaseConnection->prepareStatement(query);
+        pstmt->setString(1, foodItem);
+
+        res = pstmt->executeQuery();
+
+        if (res->next()) {
+            int foodItemId = res->getInt("FoodItemID");
+            delete res;
+            delete pstmt;
+            return foodItemId;
+        } else {
+            delete res;
+            delete pstmt;
+            return -1;
+        }
+    } catch (sql::SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete res;
+        delete pstmt;
+        return -1;
+    }
+}
+
+int DatabaseManager::getVotesForFoodItem(int foodItemId) {
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return -1;
+    }
+
+    sql::PreparedStatement *pstmt = nullptr;
+    sql::ResultSet *res = nullptr;
+
+    try {
+        std::string query = "SELECT SUM(VoteCount) AS TotalVotes FROM Votes WHERE FoodItemID = ?";
+        pstmt = databaseConnection->prepareStatement(query);
+        pstmt->setInt(1, foodItemId);
+
+        res = pstmt->executeQuery();
+
+        if (res->next()) {
+            int totalVotes = res->getInt("TotalVotes");
+            delete res;
+            delete pstmt;
+            return totalVotes;
+        } else {
+            delete res;
+            delete pstmt;
+            return 0;
+        }
+    } catch (sql::SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete res;
+        delete pstmt;
+        return -1;
+    }
+}
+
+std::string DatabaseManager::getMenuItemName(int foodItemId) {
+    if (!databaseConnection) {
+        std::cerr << "Not connected to database." << std::endl;
+        return "";
+    }
+
+    std::string menuItemName;
+    sql::PreparedStatement *pstmt = nullptr;
+    sql::ResultSet *res = nullptr;
+
+    try {
+        std::string query = "SELECT Name FROM FoodItems WHERE FoodItemID = ?";
+        pstmt = databaseConnection->prepareStatement(query);
+        pstmt->setInt(1, foodItemId);
+
+        res = pstmt->executeQuery();
+        if (res->next()) {
+            menuItemName = res->getString("Name");
+        }
+
+        delete res;
+        delete pstmt;
+    } catch (sql::SQLException &e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        delete res;
+        delete pstmt;
+    }
+
+    return menuItemName;
+}
