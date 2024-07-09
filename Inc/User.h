@@ -18,7 +18,6 @@ protected:
             std::cout << "Failed to send your request to server. Error code: " << WSAGetLastError() << std::endl;
             return false;
         }
-        std::cout << "Request sent successfully\n";
         return true;
     }
 

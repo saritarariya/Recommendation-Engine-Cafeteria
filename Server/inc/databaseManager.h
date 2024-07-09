@@ -38,9 +38,10 @@ public:
     bool storeRolledOutFoodItems(const std::vector<std::string> &foodItems , int id);
     std::vector<std::string> getNotifications();
     bool storeFeedback(int userId, int foodItemId, int rating, const std::string &comment);
-    bool storeVote(int userId, int foodItemId, int voteCount);
+    bool storeVote(int userId, int foodItemId);
     int getFoodItemId(const std::string &foodItem);
-    int getVotesForFoodItem(int foodItemId);
+    int getTotalVotesForFoodItem(int foodItemId);
+    std::string getMenuItemName(int foodItemId);
 };
 
 #endif // DATABASE_MANAGER_H

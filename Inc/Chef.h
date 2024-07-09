@@ -13,7 +13,7 @@ class Chef : public User
 public:
     Chef(Client *client) : User(client) {}
     void performRoleFunctions();
-    std::vector<int> getFoodItemsToRollOut();
+    std::vector<std::string> getFoodItemsToRollOut();
     void chooseFoodItemsForNextDay();
     void viewVotes();
     void viewNotifications();

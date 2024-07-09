@@ -1,6 +1,7 @@
 #include "Employee.h"
 
-void Employee::viewNotifications() {
+void Employee::viewNotifications()
+{
     std::string request = "viewNotifications:";
     sendRequest(request);
     std::string response = receiveResponse();
@@ -8,7 +9,8 @@ void Employee::viewNotifications() {
     std::cout << response << std::endl;
 }
 
-void Employee::provideFeedback() {
+void Employee::provideFeedback()
+{
     int foodItemId, rating;
     std::string comment;
 
@@ -16,7 +18,7 @@ void Employee::provideFeedback() {
     std::cin >> foodItemId;
     std::cout << "Enter Rating (1-5): ";
     std::cin >> rating;
-    std::cin.ignore(); 
+    std::cin.ignore();
     std::cout << "Enter Comment: ";
     std::getline(std::cin, comment);
 
@@ -29,7 +31,8 @@ void Employee::provideFeedback() {
     std::cout << response << std::endl;
 }
 
-void Employee::voteForFoodItems() {
+void Employee::voteForFoodItems()
+{
     std::string request = "viewNotifications:";
     sendRequest(request);
     std::string response = receiveResponse();
@@ -41,19 +44,22 @@ void Employee::voteForFoodItems() {
     {
         notifications.push_back(line);
     }
-    for (const auto &notification : notifications) {
-        if (notification.find("Rolled out food items:") != std::string::npos) {
-            std::cout << "Rolled out food items: " << notification << std::endl;
-
-            std::istringstream iss(notification.substr(21));
+    for (const auto &notification : notifications)
+    {
+        if (notification.find("Rolled out food items:") != std::string::npos)
+        {
+            std::cout << notification << std::endl;
+            std::istringstream iss(notification.substr(22));
             std::string foodItem;
             std::vector<std::string> foodItems;
 
-            while (std::getline(iss, foodItem, ',')) {
+            while (std::getline(iss, foodItem, ','))
+            {
                 foodItems.push_back(foodItem);
             }
 
-            for (size_t i = 0; i < foodItems.size(); ++i) {
+            for (size_t i = 0; i < foodItems.size(); ++i)
+            {
                 std::cout << i + 1 << ". " << foodItems[i] << std::endl;
             }
 
@@ -61,31 +67,46 @@ void Employee::voteForFoodItems() {
             int itemChoice;
             std::cin >> itemChoice;
 
-            if (itemChoice >= 1 && itemChoice <= foodItems.size()) {
-                 std::string request1 = "getFoodItemId:" + foodItems[itemChoice];
-                 sendRequest(request1);
-                 std::string foodItemIdStr = receiveResponse();
-                 int foodItemId = std::stoi(foodItemIdStr);
-                std::ostringstream oss;
-                std::string request = "getID:";
-                sendRequest(request);
-                std::string userID = receiveResponse();
-                oss << "submitVote:" << userID << "," << foodItemId << ",1";
-                std::string request2 = oss.str();
-                sendRequest(request2);
-                std::string response = receiveResponse();
-                std::cout << "Server response: " << response << std::endl;
-            } else {
+            if (itemChoice >= 0 && itemChoice <= foodItems.size())
+            {
+                std::string request1 = "getFoodItemId:" + foodItems[itemChoice];
+                sendRequest(request1);
+                std::string foodItemIdStr = receiveResponse();
+                int foodItemId = std::stoi(foodItemIdStr);
+
+                if (foodItemId != -1)
+                {
+                    std::ostringstream oss;
+                    std::string request = "getID:";
+                    sendRequest(request);
+                    std::string userID = receiveResponse();
+
+                    oss << "submitVote:" << userID << "," << foodItemId;
+
+                    std::string request2 = oss.str();
+                    sendRequest(request2);
+                    std::string response = receiveResponse();
+                    std::cout << "Server response: " << response << std::endl;
+                }
+                else
+                {
+                    std::cout << "Note able to fetch the correct food item ID.";
+                }
+            }
+            else
+            {
                 std::cout << "Invalid choice." << std::endl;
             }
         }
     }
-    std::cout<<"Chef have not rolled out food items\n";
+    // std::cout<<"Chef have not rolled out food items\n";
 }
 
-void Employee::performRoleFunctions() {
+void Employee::performRoleFunctions()
+{
     int choice;
-    do {
+    do
+    {
         std::cout << "Please choose an operation:" << std::endl;
         std::cout << "1. Provide Feedback" << std::endl;
         std::cout << "2. Choose Food Items for Next Day" << std::endl;
@@ -94,7 +115,8 @@ void Employee::performRoleFunctions() {
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
-        switch (choice) {
+        switch (choice)
+        {
         case 1:
             provideFeedback();
             break;

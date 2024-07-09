@@ -390,7 +390,7 @@ bool DatabaseManager::storeFeedback(int userId, int foodItemId, int rating, cons
     }
 }
 
-bool DatabaseManager::storeVote(int userId, int foodItemId, int voteCount) {
+bool DatabaseManager::storeVote(int userId, int foodItemId) {
     if (!databaseConnection) {
         std::cerr << "Not connected to database." << std::endl;
         return false;
@@ -399,11 +399,12 @@ bool DatabaseManager::storeVote(int userId, int foodItemId, int voteCount) {
     sql::PreparedStatement *pstmt = nullptr;
 
     try {
-        std::string query = "INSERT INTO Votes (UserID, FoodItemID, VoteCount) VALUES (?, ?, ?)";
+        std::string query = "INSERT INTO Votes (UserID, FoodItemID, VoteCount) VALUES (?, ?, 1) "
+                            "ON DUPLICATE KEY UPDATE VoteCount = VoteCount + 1";
+
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setInt(1, userId);
         pstmt->setInt(2, foodItemId);
-        pstmt->setInt(3, voteCount);
 
         pstmt->executeUpdate();
         delete pstmt;
@@ -425,7 +426,7 @@ int DatabaseManager::getFoodItemId(const std::string &foodItem) {
     sql::ResultSet *res = nullptr;
 
     try {
-        std::string query = "SELECT FoodItemID FROM FoodItems WHERE Name = ?";
+        std::string query = "SELECT FoodItemID FROM FoodItems WHERE FoodItemName = ?";
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setString(1, foodItem);
 
@@ -449,7 +450,7 @@ int DatabaseManager::getFoodItemId(const std::string &foodItem) {
     }
 }
 
-int DatabaseManager::getVotesForFoodItem(int foodItemId) {
+int DatabaseManager::getTotalVotesForFoodItem(int foodItemId) {
     if (!databaseConnection) {
         std::cerr << "Not connected to database." << std::endl;
         return -1;
@@ -457,6 +458,7 @@ int DatabaseManager::getVotesForFoodItem(int foodItemId) {
 
     sql::PreparedStatement *pstmt = nullptr;
     sql::ResultSet *res = nullptr;
+    int totalVotes = 0;
 
     try {
         std::string query = "SELECT SUM(VoteCount) AS TotalVotes FROM Votes WHERE FoodItemID = ?";
@@ -466,21 +468,18 @@ int DatabaseManager::getVotesForFoodItem(int foodItemId) {
         res = pstmt->executeQuery();
 
         if (res->next()) {
-            int totalVotes = res->getInt("TotalVotes");
-            delete res;
-            delete pstmt;
-            return totalVotes;
-        } else {
-            delete res;
-            delete pstmt;
-            return 0;
+            totalVotes = res->getInt("TotalVotes");
         }
+
+        delete res;
+        delete pstmt;
     } catch (sql::SQLException &e) {
         std::cerr << "SQL Error: " << e.what() << std::endl;
         delete res;
         delete pstmt;
         return -1;
     }
+    return totalVotes;
 }
 
 std::string DatabaseManager::getMenuItemName(int foodItemId) {
@@ -494,13 +493,13 @@ std::string DatabaseManager::getMenuItemName(int foodItemId) {
     sql::ResultSet *res = nullptr;
 
     try {
-        std::string query = "SELECT Name FROM FoodItems WHERE FoodItemID = ?";
+        std::string query = "SELECT FoodItemName FROM FoodItems WHERE FoodItemID = ?";
         pstmt = databaseConnection->prepareStatement(query);
         pstmt->setInt(1, foodItemId);
 
         res = pstmt->executeQuery();
         if (res->next()) {
-            menuItemName = res->getString("Name");
+            menuItemName = res->getString("FoodItemName");
         }
 
         delete res;

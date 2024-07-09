@@ -93,10 +93,10 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
             {
                 response += std::to_string(std::get<0>(feedback)) + "\n";
                 response += std::to_string(std::get<1>(feedback)) + "\n";
-                response += std::to_string(std::get<2>(feedback)) + "\n"; 
-                response += std::to_string(std::get<3>(feedback)) + "\n"; 
-                response += std::get<4>(feedback) + "\n";                 
-                response += std::get<5>(feedback) + "\n";              
+                response += std::to_string(std::get<2>(feedback)) + "\n";
+                response += std::to_string(std::get<3>(feedback)) + "\n";
+                response += std::get<4>(feedback) + "\n";
+                response += std::get<5>(feedback) + "\n";
             }
 
             int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
@@ -109,9 +109,9 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
                 std::cout << "Response sent successfully. Bytes sent: " << bytesSent << std::endl;
             }
         }
-        else if (request.substr(0, 23) == "Rolled out food items:")
+        else if (request.substr(0, 22) == "Rolled out food items:")
         {
-            std::string rolledOutItems = request.substr(23);
+            std::string rolledOutItems = request.substr(22);
             std::istringstream iss(rolledOutItems);
             std::vector<std::string> foodItems;
             std::string item;
@@ -155,9 +155,9 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
                 std::cout << "Response sent successfully. Bytes sent: " << bytesSent << std::endl;
             }
         }
-        else if (request.substr(0, 15) == "provideFeedback:")
+        else if (request.substr(0, 16) == "provideFeedback:")
         {
-            std::string feedbackData = request.substr(15);
+            std::string feedbackData = request.substr(16);
             std::istringstream iss(feedbackData);
             std::string token;
 
@@ -183,9 +183,9 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
                 send(clientSocket, response.c_str(), response.size(), 0);
             }
         }
-        else if (request.substr(0, 10) == "submitVote:")
+        else if (request.substr(0, 11) == "submitVote:")
         {
-            std::string voteData = request.substr(10);
+            std::string voteData = request.substr(11);
             std::istringstream iss(voteData);
             std::string token;
 
@@ -195,35 +195,45 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
                 tokens.push_back(token);
             }
 
-            if (tokens.size() == 3)
+            if (tokens.size() == 2)
             {
                 int userId = std::stoi(tokens[0]);
                 int foodItemId = std::stoi(tokens[1]);
-                int voteCount = std::stoi(tokens[2]);
 
                 dbManager.connect();
-                bool voteSuccess = dbManager.storeVote(userId, foodItemId, voteCount);
+                bool voteSuccess = dbManager.storeVote(userId, foodItemId);
                 std::string response = voteSuccess ? "Vote stored successfully" : "Failed to store vote";
 
+                std::cout << "Vote storage result: " << response << std::endl;
                 send(clientSocket, response.c_str(), response.size(), 0);
             }
             else
             {
                 std::string response = "Invalid vote data";
+                std::cout << "Invalid vote data: " << voteData << std::endl;
                 send(clientSocket, response.c_str(), response.size(), 0);
             }
         }
-        else if (request.substr(0, 17) == "getFoodItemId:")
+        else if (request.substr(0, 14) == "getFoodItemId:")
         {
-            std::string foodItem = request.substr(17);
+            std::string foodItem = request.substr(15);
             int foodItemId = dbManager.getFoodItemId(foodItem);
             std::string response = std::to_string(foodItemId);
             send(clientSocket, response.c_str(), response.size(), 0);
         }
-        else if (request.substr(0, 21) == "getVotesForFoodItem:")
+        else if (request.substr(0, 16) == "getMenuItemName:")
         {
-            int foodItemId = std::stoi(request.substr(21));
-            int votes = dbManager.getVotesForFoodItem(foodItemId);
+            std::string foodItemIdStr = request.substr(16);
+            int foodItemId = std::stoi(foodItemIdStr);
+
+            std::string foodItemName = dbManager.getMenuItemName(foodItemId);
+            std::string response = foodItemName;
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+        else if (request.substr(0, 20) == "getVotesForFoodItem:")
+        {
+            int foodItemId = std::stoi(request.substr(20));
+            int votes = dbManager.getTotalVotesForFoodItem(foodItemId);
             std::string response = std::to_string(votes);
             send(clientSocket, response.c_str(), response.size(), 0);
         }

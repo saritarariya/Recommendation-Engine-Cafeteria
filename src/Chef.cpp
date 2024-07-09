@@ -1,16 +1,25 @@
 
 #include "Chef.h"
 
-std::vector<int> Chef::getFoodItemsToRollOut()
+std::vector<std::string> Chef::getFoodItemsToRollOut()
 {
-    std::vector<int> topFoodItems;
+    std::vector<int> topFoodItemIds;
     RecommendationEngine engine;
     std::string request = "getAllFeedbacks:";
     sendRequest(request);
     std::string response = receiveResponse();
     engine.parseAndAddFeedbacks(response);
-    topFoodItems = engine.getTopFoodItems();
+
+    topFoodItemIds = engine.getTopFoodItems();
+
+    std::vector<std::string> topFoodItems;
+    
+    for (const auto& id : topFoodItemIds) {
+        topFoodItems.push_back(getMenuItemName(id));
+    }
+
     std::cout << "Top 5 Recommended Food Items:" << std::endl;
+    
     for (size_t i = 0; i < topFoodItems.size() && i < 5; ++i)
     {
         std::cout << i + 1 << ". " << topFoodItems[i] << std::endl;
@@ -20,12 +29,7 @@ std::vector<int> Chef::getFoodItemsToRollOut()
 
 void Chef::chooseFoodItemsForNextDay()
 {
-    std::vector<int> topFoodItemsIDs = getFoodItemsToRollOut();
-    std::vector<std::string> topFoodItems;
-    for (const auto& id : topFoodItemsIDs) {
-        topFoodItems.push_back(getMenuItemName(id));
-    }
-
+    std::vector<std::string> topFoodItems = getFoodItemsToRollOut();
     std::vector<std::string> chosenItems;
 
     while (chosenItems.size() < 5)
@@ -100,6 +104,7 @@ void Chef::viewVotes()
     std::vector<std::string> notifications;
     std::istringstream iss(response);
     std::string line;
+
     while (std::getline(iss, line))
     {
         notifications.push_back(line);
@@ -109,9 +114,10 @@ void Chef::viewVotes()
     {
         if (notification.find("Rolled out food items:") != std::string::npos)
         {
-            std::cout << "Rolled out food items: " << notification.substr(21) << std::endl;
+            std::cout << "Rolled out food items:" << notification.substr(22) << std::endl;
 
-            std::istringstream itemStream(notification.substr(21));
+            std::istringstream itemStream(notification.substr(22));
+
             std::string foodItem;
             std::vector<std::string> foodItems;
 
@@ -124,9 +130,10 @@ void Chef::viewVotes()
             {
                 std::string request = "getFoodItemId:" + item;
                 sendRequest(request);
+
                 std::string foodItemIdStr = receiveResponse();
                 int foodItemId = std::stoi(foodItemIdStr);
-
+ 
                 request = "getVotesForFoodItem:" + std::to_string(foodItemId);
                 sendRequest(request);
                 std::string votesStr = receiveResponse();
