@@ -21,7 +21,7 @@ private:
     int portNumber;
     std::string mailID;
     std::string password;
-
+    std::string role;
 public:
     SOCKET clientSocket;
     ~Client()
@@ -36,6 +36,8 @@ public:
     bool connectToServer();
     bool verifyUser();
     void setEmail(const std::string &email);
+    void setRole(const std::string &role);
+    std::string getRole();
     std::string getEmail();
     SOCKET getClientSocket();
     void setPassword(const std::string& password);

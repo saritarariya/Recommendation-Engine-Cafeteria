@@ -244,3 +244,12 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
         }
     }
 }
+
+void ClientRequestHandler::sendResponse(const SOCKET clientSocket, const std::string &response) {
+    int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
+    if (bytesSent == SOCKET_ERROR) {
+        std::cerr << "Failed to send response to client. Error code: " << WSAGetLastError() << std::endl;
+    } else {
+        std::cout << "Response sent successfully. Bytes sent: " << bytesSent << std::endl;
+    }
+}

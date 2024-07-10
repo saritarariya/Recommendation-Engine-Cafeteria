@@ -12,7 +12,7 @@ class ClientRequestHandler
 public:
     ClientRequestHandler(DatabaseManager &dbManager);
     void processRequest(const std::string &request, const SOCKET clientSocket, const int id);
-
+    void sendResponse(const SOCKET clientSocket, const std::string &response);
 private:
     DatabaseManager &dbManager;
 };

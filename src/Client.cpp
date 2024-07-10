@@ -115,3 +115,11 @@ std::string Client::getEmail() {
 SOCKET Client::getClientSocket() {
     return clientSocket;
 }
+
+void Client::setRole(const std::string &role) {
+    this->role = role;
+}
+
+std::string Client::getRole() {
+    return role;
+}

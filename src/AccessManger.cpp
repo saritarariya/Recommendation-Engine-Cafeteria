@@ -34,6 +34,7 @@ std::string AccessManager::extractRole(const std::string& email) {
 
 void AccessManager::grantEmployeeAccess(const std::string& email) {
     std::cout << "Granting employee access to " << email << std::endl;
+    client->setRole("employee");
     Employee* employee = new Employee(client);
     employee->performRoleFunctions();
     delete employee;
@@ -41,6 +42,7 @@ void AccessManager::grantEmployeeAccess(const std::string& email) {
 
 void AccessManager::grantChefAccess(const std::string& email) {
     std::cout << "Granting chef access to " << email << std::endl;
+    client->setRole("chef");
     Chef* chef = new Chef(client);
     chef->performRoleFunctions();
     delete chef;
@@ -48,6 +50,7 @@ void AccessManager::grantChefAccess(const std::string& email) {
 
 void AccessManager::grantAdminAccess(const std::string& email) {
     std::cout << "Granting admin access to " << email << std::endl;
+    client->setRole("admin");
     Admin* admin = new Admin(client);
     admin->performRoleFunctions();
     delete admin;
