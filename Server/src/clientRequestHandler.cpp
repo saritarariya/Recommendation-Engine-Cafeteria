@@ -76,6 +76,10 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
         {
             handleGetFoodItemDetails(request, clientSocket);
         }
+        else if (request.substr(0, 26) == "UpdateDiscardMenuItemList:")
+        {
+            handleUpdateDiscardMenuItemList(request, clientSocket);
+        }
         else
         {
             std::string response = "Unknown request";
@@ -391,4 +395,26 @@ void ClientRequestHandler::handleGetFoodItemDetails(const std::string &request, 
     std::string foodItemName = request.substr(20);
     std::string response = employeeDbManager.showFoodItemDetails(foodItemName);
     sendResponse(clientSocket, response);
+}
+
+void ClientRequestHandler::handleUpdateDiscardMenuItemList(const std::string &request, const SOCKET clientSocket) {
+    std::string discardedMenuItemsIdList = request.substr(26);
+    std::cout << discardedMenuItemsIdList << std::endl;
+    std::istringstream iss(discardedMenuItemsIdList);
+    std::vector<int> discardedMenuItems;
+    std::string itemIDStr;
+    while (std::getline(iss, itemIDStr, ',')) {
+        if (!itemIDStr.empty()) {
+            int menuItemId = stoi(itemIDStr);
+            discardedMenuItems.push_back(menuItemId);
+        }
+    }
+
+ for (size_t i = 0; i < discardedMenuItems.size(); ++i) {
+        std::cout << i + 1 << ". " << discardedMenuItems[i] << std::endl;
+    }
+
+    bool success = chefDbManager.storeDiscardMenuItemList(discardedMenuItems);
+    std::string response = success ? "Discarded menu items stored successfully" : "Failed to store discarded menu items";
+    int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
 }

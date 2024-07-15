@@ -15,5 +15,7 @@ public:
     void addFeedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt);
     std::vector<int> getTopFoodItems() const;
     void parseAndAddFeedbacks(const std::string& feedbackData);
+    std::vector<int> getItemsToDiscard() const;
+
 };
 #endif

@@ -19,6 +19,7 @@ public:
     void viewNotifications();
     void viewAllMenuItems();
     std::string getMenuItemName(const int &foodItemId);
+    void viewDiscardMenuItemList();
 };
 
 #endif

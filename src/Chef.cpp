@@ -156,7 +156,8 @@ void Chef::performRoleFunctions()
         std::cout << "3. View all menu items" << std::endl;
         std::cout << "4. View votes on food Items." << std::endl;
         std::cout << "5. View Notifications" << std::endl;
-        std::cout << "6. Exit" << std::endl;
+        std::cout << "6. View Discard MenuItem List" << std::endl;
+        std::cout << "7. Exit" << std::endl;
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
@@ -178,6 +179,9 @@ void Chef::performRoleFunctions()
             viewNotifications();
             break;
         case 6:
+            viewDiscardMenuItemList();
+            break;
+        case 7:
             std::cout << "Exiting..." << std::endl;
             break;
         default:
@@ -201,4 +205,25 @@ std::string Chef::getMenuItemName(const int &foodItemId) {
     sendRequest(request);
     std::string response = receiveResponse();
     return response;
+}
+
+void Chef::viewDiscardMenuItemList() 
+{
+    std::vector<int> discardMenuItemList;
+    RecommendationEngine engine;
+    std::string request1 = "getAllFeedbacks:";
+    sendRequest(request1);
+    std::string response1 = receiveResponse();
+    engine.parseAndAddFeedbacks(response1);
+    discardMenuItemList = engine.getItemsToDiscard();
+    std::string request2 = "UpdateDiscardMenuItemList:";
+    std::cout << "Discard Menu Item List:" << std::endl;
+    for (size_t i = 0; i < discardMenuItemList.size(); ++i)
+    {
+        request2 = request2 + std::to_string(discardMenuItemList[i]) + ",";
+        std::cout << i + 1 << ". " << getMenuItemName(discardMenuItemList[i]) << std::endl;
+    }
+    sendRequest(request2);
+    std::string response2 = receiveResponse();
+    std::cout << response2 << std::endl;
 }

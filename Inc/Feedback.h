@@ -22,6 +22,7 @@ public:
     std::string getComment() const;
     std::string getCreatedAt() const;
     int calculateSentimentScore() const;
+    bool checkIsItemCanBeDiscarded() const;
 };
 
 #endif // FEEDBACK_H

@@ -71,3 +71,27 @@ int ChefDatabaseManager::getTotalVotesForFoodItem(int foodItemId) {
     }
     return totalVotes;
 }
+
+bool ChefDatabaseManager::storeDiscardMenuItemList(const std::vector<int>& discardedMenuItems) {
+
+
+
+    sql::Connection* conn = dbConnection->getConnection();
+    sql::PreparedStatement* pstmt = nullptr;
+
+    try {
+        std::string query = "INSERT INTO DiscardMenuItemList (foodItemID) VALUES (?)";
+        pstmt = conn->prepareStatement(query);
+
+        for (const auto& itemId : discardedMenuItems) {
+            pstmt->setInt(1, itemId);
+            pstmt->executeUpdate();
+        }
+        delete pstmt;
+        return true;
+    } catch (sql::SQLException& e) {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        if (pstmt) delete pstmt;
+        return false;
+    }
+}

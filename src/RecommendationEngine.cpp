@@ -60,3 +60,17 @@ void RecommendationEngine::parseAndAddFeedbacks(const std::string& feedbackData)
         addFeedback(feedbackId, userId, foodItemId, rating, comment, createdAt);
     }
 }
+
+std::vector<int> RecommendationEngine::getItemsToDiscard() const
+{
+    std::vector<int>discardMenuItemsID;
+    for (const auto& feedback : feedbacks) 
+    {
+        if(feedback.checkIsItemCanBeDiscarded())
+        {
+            int foodItemID = feedback.getFoodItemId();
+            discardMenuItemsID.push_back(foodItemID);
+        }
+    }
+    return discardMenuItemsID;
+}

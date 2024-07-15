@@ -32,6 +32,7 @@ private:
     void handleFetchEmployeePreferences(const std::string &request, const SOCKET clientSocket);
     void handleRolledOutFoodItems(const std::string &request, const SOCKET clientSocket, int userID);
     void handleGetFoodItemDetails(const std::string &request, const SOCKET clientSocket);
+    void handleUpdateDiscardMenuItemList(const std::string &request, const SOCKET clientSocket);
 public:
     ClientRequestHandler(AdminDatabaseManager &adminDbManager, EmployeeDatabaseManager &employeeDbManager, ChefDatabaseManager &chefDbManager);
     void processRequest(const std::string &request, const SOCKET clientSocket, const int id);
