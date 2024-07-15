@@ -80,6 +80,10 @@ void ClientRequestHandler::processRequest(const std::string &request, const SOCK
         {
             handleUpdateDiscardMenuItemList(request, clientSocket);
         }
+        else if (request.substr(0, 20) == "GetDetailedFeedback:")
+        {
+            handleGetDetailedFeedback(request, clientSocket);
+        }
         else
         {
             std::string response = "Unknown request";
@@ -163,7 +167,7 @@ void ClientRequestHandler::handleAddMenuItem(const std::string &request, const S
 void ClientRequestHandler::handleDeleteMenuItem(const std::string &request, const SOCKET clientSocket)
 {
     std::string name = request.substr(15);
-    bool success = adminDbManager.deleteMenuItem(name);
+    bool success = adminDbManager.deleteFoodItem(name);
     std::string response = success ? "Menu item deleted successfully" : "Failed to delete menu item";
     sendResponse(clientSocket, response);
 }
@@ -418,3 +422,17 @@ void ClientRequestHandler::handleUpdateDiscardMenuItemList(const std::string &re
     std::string response = success ? "Discarded menu items stored successfully" : "Failed to store discarded menu items";
     int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
 }
+
+void ClientRequestHandler::handleGetDetailedFeedback(const std::string &request, const SOCKET clientSocket)
+{
+    std::string foodItemName = request.substr(20);
+    std::string message = "We are trying to improve your experience with " + foodItemName + ". Please provide your feedback and help us.\n"
+                      "Q1. What did not you like about " + foodItemName + "?\n"
+                      "Q2. How would you like " + foodItemName + " to taste?\n"
+                      "Q3. Share your moms recipe";
+
+    bool success = chefDbManager.storeQuestionInfo(message);
+    std::string response = success ? "Detailed feedback stored successfully" : "Failed to store detailed feedback";
+    int bytesSent = send(clientSocket, response.c_str(), response.size(), 0);
+}
+

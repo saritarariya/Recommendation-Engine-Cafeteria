@@ -33,20 +33,85 @@ bool AdminDatabaseManager::addMenuItem(const string &name, const string &descrip
     }
 }
 
-bool AdminDatabaseManager::deleteMenuItem(const string &name)
+bool AdminDatabaseManager::deleteFoodItem(const std::string &foodItemName)
 {
+    sql::Connection *conn = dbConnection->getConnection();
+    sql::PreparedStatement *pstmt = nullptr;
+
     try
     {
-        Connection *conn = dbConnection->getConnection();
-        PreparedStatement *pstmt = conn->prepareStatement("DELETE FROM FoodItems WHERE FoodItemName = ?");
-        pstmt->setString(1, name);
-        pstmt->execute();
+        // Start a transaction
+        conn->setAutoCommit(false);
+
+        // First, get the foodItemID for the given foodItemName
+        std::string query = "SELECT FoodItemID FROM fooditems WHERE FoodItemName = ?";
+        pstmt = conn->prepareStatement(query);
+        pstmt->setString(1, foodItemName);
+        sql::ResultSet *res = pstmt->executeQuery();
+
+        int foodItemID = -1;
+        if (res->next())
+        {
+            foodItemID = res->getInt("FoodItemID");
+        }
+        delete res;
         delete pstmt;
+
+        if (foodItemID == -1)
+        {
+            std::cerr << "Food item not found: " << foodItemName << std::endl;
+            return false;
+        }
+
+        // Delete the corresponding rows from feedback table
+        query = "DELETE FROM feedback WHERE FoodItemID = ?";
+        pstmt = conn->prepareStatement(query);
+        pstmt->setInt(1, foodItemID);
+        pstmt->executeUpdate();
+        delete pstmt;
+
+        // Delete the corresponding rows from discardmenuitemlist table
+        query = "DELETE FROM discardmenuitemlist WHERE foodItemID = ?";
+        pstmt = conn->prepareStatement(query);
+        pstmt->setInt(1, foodItemID);
+        pstmt->executeUpdate();
+        delete pstmt;
+
+        // Delete the corresponding rows from votes table
+        query = "DELETE FROM votes WHERE FoodItemID = ?";
+        pstmt = conn->prepareStatement(query);
+        pstmt->setInt(1, foodItemID);
+        pstmt->executeUpdate();
+        delete pstmt;
+
+        // Now, delete the food item from the fooditems table
+        query = "DELETE FROM fooditems WHERE FoodItemID = ?";
+        pstmt = conn->prepareStatement(query);
+        pstmt->setInt(1, foodItemID);
+        pstmt->executeUpdate();
+        delete pstmt;
+
+        // Commit the transaction
+        conn->commit();
+        conn->setAutoCommit(true);
+
         return true;
     }
-    catch (SQLException &e)
+    catch (sql::SQLException &e)
     {
-        cerr << "Error deleting menu item: " << e.what() << endl;
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        if (pstmt != nullptr)
+        {
+            delete pstmt;
+        }
+        try
+        {
+            conn->rollback();
+        }
+        catch (sql::SQLException &rollbackEx)
+        {
+            std::cerr << "Rollback Error: " << rollbackEx.what() << std::endl;
+        }
         return false;
     }
 }

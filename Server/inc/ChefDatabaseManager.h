@@ -22,6 +22,7 @@ public:
     bool storeRolledOutFoodItems(const std::vector<std::string> &foodItems, int id);
     int getTotalVotesForFoodItem(int foodItemId);
     bool storeDiscardMenuItemList(const std::vector<int>& discardedMenuItems);
+    bool storeQuestionInfo(const std::string &message);
     bool connect();
 };
 

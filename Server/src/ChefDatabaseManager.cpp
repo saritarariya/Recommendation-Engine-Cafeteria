@@ -95,3 +95,31 @@ bool ChefDatabaseManager::storeDiscardMenuItemList(const std::vector<int>& disca
         return false;
     }
 }
+
+bool ChefDatabaseManager::storeQuestionInfo(const std::string &message)
+{
+    sql::Connection *conn = dbConnection->getConnection();
+    sql::PreparedStatement *pstmt = nullptr;
+
+    try
+    {
+        std::string query = "INSERT INTO Notifications (Message, Type) VALUES (?, 'Info')";
+        pstmt = conn->prepareStatement(query);
+
+        pstmt->setString(1, message);
+
+        pstmt->executeUpdate();
+
+
+        delete pstmt;
+        return true;
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "SQL Error: " << e.what() << std::endl;
+        if (pstmt != nullptr) {
+            delete pstmt;
+        }
+        return false;
+    }
+}

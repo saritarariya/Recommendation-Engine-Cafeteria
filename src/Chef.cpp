@@ -1,4 +1,3 @@
-
 #include "Chef.h"
 
 std::vector<std::string> Chef::getFoodItemsToRollOut()
@@ -13,13 +12,14 @@ std::vector<std::string> Chef::getFoodItemsToRollOut()
     topFoodItemIds = engine.getTopFoodItems();
 
     std::vector<std::string> topFoodItems;
-    
-    for (const auto& id : topFoodItemIds) {
+
+    for (const auto &id : topFoodItemIds)
+    {
         topFoodItems.push_back(getMenuItemName(id));
     }
 
     std::cout << "Top 5 Recommended Food Items:" << std::endl;
-    
+
     for (size_t i = 0; i < topFoodItems.size() && i < 5; ++i)
     {
         std::cout << i + 1 << ". " << topFoodItems[i] << std::endl;
@@ -133,7 +133,7 @@ void Chef::viewVotes()
 
                 std::string foodItemIdStr = receiveResponse();
                 int foodItemId = std::stoi(foodItemIdStr);
- 
+
                 request = "getVotesForFoodItem:" + std::to_string(foodItemId);
                 sendRequest(request);
                 std::string votesStr = receiveResponse();
@@ -200,14 +200,15 @@ void Chef::viewAllMenuItems()
     std::cout << response << std::endl;
 }
 
-std::string Chef::getMenuItemName(const int &foodItemId) {
+std::string Chef::getMenuItemName(const int &foodItemId)
+{
     std::string request = "getMenuItemName:" + std::to_string(foodItemId);
     sendRequest(request);
     std::string response = receiveResponse();
     return response;
 }
 
-void Chef::viewDiscardMenuItemList() 
+void Chef::viewDiscardMenuItemList()
 {
     std::vector<int> discardMenuItemList;
     RecommendationEngine engine;
@@ -226,4 +227,39 @@ void Chef::viewDiscardMenuItemList()
     sendRequest(request2);
     std::string response2 = receiveResponse();
     std::cout << response2 << std::endl;
+
+    int choice;
+    std::cout << "1. Remove the Food Item from Menu List:" << std::endl;
+    std::cout << "2. Get Detailed Feedback:" << std::endl;
+    std::cin >> choice;
+    if (choice == 1)
+    {
+
+        std::string name;
+        std::cout << "Enter the name of the menu item to delete: ";
+        std::cin.ignore();
+        std::getline(std::cin, name);
+        std::string request = "deleteMenuItem:" + name;
+        sendRequest(request);
+        std::string response = receiveResponse();
+        if (response == "Menu item deleted successfully")
+        {
+            std::cout << "Menu item '" << name << "' deleted successfully!" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Failed to delete menu item '" << name << "'. Please try again." << std::endl;
+        }
+    }
+    else if (choice == 2)
+    {
+        std::string name;
+        std::cout << "Enter the name of the menu item: ";
+        std::cin.ignore();
+        std::getline(std::cin, name);
+        std::string request = "GetDetailedFeedback:" + name;
+        sendRequest(request);
+        std::string response = receiveResponse();
+        std::cout << response << std::endl;
+    }
 }
