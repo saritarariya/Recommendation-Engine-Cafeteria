@@ -22,6 +22,7 @@ private:
     std::string mailID;
     std::string password;
     std::string role;
+    std::string userID;
 public:
     SOCKET clientSocket;
     ~Client()
@@ -41,6 +42,7 @@ public:
     std::string getEmail();
     SOCKET getClientSocket();
     void setPassword(const std::string& password);
+    int getUserID();
 };
 
 #endif

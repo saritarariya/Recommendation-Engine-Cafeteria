@@ -36,6 +36,8 @@ void AccessManager::grantEmployeeAccess(const std::string& email) {
     std::cout << "Granting employee access to " << email << std::endl;
     client->setRole("employee");
     Employee* employee = new Employee(client);
+    int userID = client->getUserID();
+    employee->createProfile(userID);
     employee->performRoleFunctions();
     delete employee;
 }

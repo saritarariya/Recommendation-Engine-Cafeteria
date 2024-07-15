@@ -130,13 +130,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="inc\AdminDatabaseManager.h" />
+    <ClInclude Include="inc\ChefDatabaseManager.h" />
     <ClInclude Include="inc\clientRequestHandler.h" />
-    <ClInclude Include="inc\databaseManager.h" />
+    <ClInclude Include="inc\DatabaseConnection.h" />
+    <ClInclude Include="inc\EmployeeDatabaseManager.h" />
     <ClInclude Include="inc\Server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AdminDatabaseManager.cpp" />
+    <ClCompile Include="src\ChefDatabaseManager.cpp" />
     <ClCompile Include="src\clientRequestHandler.cpp" />
-    <ClCompile Include="src\databaseManager.cpp" />
+    <ClCompile Include="src\DatabaseConnection.cpp" />
+    <ClCompile Include="src\EmployeeDatabaseManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>

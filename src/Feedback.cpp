@@ -2,7 +2,6 @@
 #include <sstream>
 #include <unordered_set>
 
-// Define the positive and negative words for sentiment analysis
 std::unordered_set<std::string> positive_words = {
     "delicious", "tasty", "flavorful", "perfect", "excellent", "good"
 };

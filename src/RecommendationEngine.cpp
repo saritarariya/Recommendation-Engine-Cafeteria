@@ -57,11 +57,6 @@ void RecommendationEngine::parseAndAddFeedbacks(const std::string& feedbackData)
         rating = std::stoi(line);
         std::getline(iss, comment);
         std::getline(iss, createdAt);
-
         addFeedback(feedbackId, userId, foodItemId, rating, comment, createdAt);
     }
-}
-
-void RecommendationEngine::performRoleFunctions() {
-    std::cout <<"delete this function later\n";
 }

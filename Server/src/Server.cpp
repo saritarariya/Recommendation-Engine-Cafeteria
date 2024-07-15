@@ -111,8 +111,11 @@ int Server::listenFunction()
 void Server::handleClient(SOCKET clientSocket)
 {
     int userId;
-    DatabaseManager databaseManager;
-    ClientRequestHandler requestHandler(databaseManager);
+    DatabaseConnection *dbConnection = new DatabaseConnection();
+    AdminDatabaseManager adminDBManager(dbConnection);
+    ChefDatabaseManager chefDBManager(dbConnection); 
+    EmployeeDatabaseManager employeeDBManger(dbConnection); 
+    ClientRequestHandler requestHandler(adminDBManager, employeeDBManger, chefDBManager);
     char buffer[256];
 
     while (true)
@@ -137,11 +140,10 @@ void Server::handleClient(SOCKET clientSocket)
                 std::string email = credentials.substr(0, commaPos);
                 std::string password = credentials.substr(commaPos + 1);
 
-                databaseManager.connect();
-                userId = databaseManager.loginUser(email, password);
+                dbConnection->connect();
+                userId = dbConnection->loginUser(email, password);
                 bool loginSuccess = (userId != -1);
                 std::string response = loginSuccess ? "Login successful" : "Login failed";
-
                 send(clientSocket, response.c_str(), response.size(), 0);
 
                 if (loginSuccess)
