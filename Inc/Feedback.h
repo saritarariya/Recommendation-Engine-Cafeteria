@@ -3,7 +3,8 @@
 
 #include <string>
 
-class Feedback {
+class Feedback
+{
 
 private:
     int feedbackId;
@@ -14,7 +15,7 @@ private:
     std::string createdAt;
 
 public:
-    Feedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt);
+    Feedback(int feedbackId, int userId, int foodItemId, int rating, const std::string &comment, const std::string &createdAt);
     int getFeedbackId() const;
     int getUserId() const;
     int getFoodItemId() const;

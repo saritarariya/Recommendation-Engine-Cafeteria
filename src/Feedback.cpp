@@ -68,7 +68,7 @@ bool Feedback::checkIsItemCanBeDiscarded() const
     {
         if (negative_words.count(word) && getRating() < 3)
         {
-              return true;
+            return true;
         }
     }
     return false;

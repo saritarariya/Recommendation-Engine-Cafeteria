@@ -7,15 +7,15 @@
 #include <vector>
 #include <unordered_map>
 
-class RecommendationEngine {
+class RecommendationEngine
+{
 private:
     std::vector<Feedback> feedbacks;
 
 public:
-    void addFeedback(int feedbackId, int userId, int foodItemId, int rating, const std::string& comment, const std::string& createdAt);
+    void addFeedback(int feedbackId, int userId, int foodItemId, int rating, const std::string &comment, const std::string &createdAt);
     std::vector<int> getTopFoodItems() const;
-    void parseAndAddFeedbacks(const std::string& feedbackData);
+    void parseAndAddFeedbacks(const std::string &feedbackData);
     std::vector<int> getItemsToDiscard() const;
-
 };
 #endif

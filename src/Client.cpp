@@ -1,17 +1,5 @@
 #include "Client.h"
 
-void Client::handleCtrlC(int signal)
-{
-    char str[MAX_LEN] = "#exit";
-    send(clientSocket, str, sizeof(str), 0);
-    exitFlag = true;
-    tSend.detach();
-    tReceive.detach();
-    closesocket(clientSocket);
-    std::cout << signal;
-    exit(signal);
-}
-
 int Client::createSocket()
 {
     clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

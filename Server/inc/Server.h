@@ -36,7 +36,6 @@ private:
 public:
     Server();
     ~Server();
-
     int createSocket();
     void assignServerAddress();
     int bindSocketAddress();

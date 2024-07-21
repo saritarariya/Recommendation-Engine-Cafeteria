@@ -18,5 +18,4 @@ private:
     void grantChefAccess(const std::string &email);
     void grantAdminAccess(const std::string &email);
 };
-
 #endif

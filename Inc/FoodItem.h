@@ -1,6 +1,7 @@
 #include <string>
 
-class FoodItem {
+class FoodItem
+{
 private:
     int foodItemId;
     std::string foodItemName;
@@ -12,10 +13,11 @@ private:
     std::string spiceLevel;
     std::string cuisine;
     bool isSweet;
+
 public:
-    FoodItem(const std::string& name, const std::string& desc, double price,
-         const std::string& category, bool avail, const std::string& type,
-         const std::string& spice, const std::string& cuisine, bool isSweet);
+    FoodItem(const std::string &name, const std::string &desc, double price,
+             const std::string &category, bool avail, const std::string &type,
+             const std::string &spice, const std::string &cuisine, bool isSweet);
 
     int getFoodItemId() const;
     std::string getFoodItemName() const;

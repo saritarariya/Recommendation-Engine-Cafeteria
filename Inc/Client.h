@@ -5,8 +5,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <string>
-#include <thread>
-#include <mutex>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -15,25 +13,18 @@
 class Client
 {
 private:
-    bool exitFlag = false;
-    std::thread tSend, tReceive;
     struct sockaddr_in client;
     int portNumber;
     std::string mailID;
     std::string password;
     std::string role;
     std::string userID;
-public:
     SOCKET clientSocket;
-    ~Client()
-    {
-        closesocket(clientSocket);
-        WSACleanup();
-    }
     int createSocket();
     int connectSocket();
     void assignClientAddress(const std::string &ipAddress, int port);
-    void handleCtrlC(int signal);
+
+public:
     bool connectToServer();
     bool verifyUser();
     void setEmail(const std::string &email);
@@ -44,5 +35,4 @@ public:
     void setPassword(const std::string& password);
     int getUserID();
 };
-
 #endif

@@ -73,9 +73,6 @@ int ChefDatabaseManager::getTotalVotesForFoodItem(int foodItemId) {
 }
 
 bool ChefDatabaseManager::storeDiscardMenuItemList(const std::vector<int>& discardedMenuItems) {
-
-
-
     sql::Connection* conn = dbConnection->getConnection();
     sql::PreparedStatement* pstmt = nullptr;
 

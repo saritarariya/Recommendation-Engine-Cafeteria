@@ -8,17 +8,17 @@ int main()
     if (client.connectToServer() == 1)
     {
         std::cout << "********** Recommendation-Engine-Cafeteria **********" << std::endl;
-        std::cout << "=== Login Panel ===" << std::endl;
+        std::cout << "======================= Login Panel =======================" << std::endl;
         std::string email,password;
         std::cout << "Enter email:-";
-        std::cin >> email;
+        getline(std::cin, email);
         std::cout << "Enter password:-";
-        std::cin >> password;
+        getline(std::cin, password);
         client.setEmail(email);
         client.setPassword(password);
         if (client.verifyUser())
         {
-            std::cout << "user login successfull\n";
+            std::cout << "user login success full\n";
             AccessManager *accessManager = new AccessManager(&client);
             accessManager->grantAccess(email);
         }

@@ -29,12 +29,12 @@ void Employee::provideFeedback()
     std::cin.ignore(1, '\n');
     std::cout << "Enter Comment: ";
     std::getline(std::cin, comment);
-    
-    std::string request1 = "getFoodItemId: " +  FoodItemName;
+
+    std::string request1 = "getFoodItemId: " + FoodItemName;
     sendRequest(request1);
     std::string foodItemIdStr = receiveResponse();
     foodItemId = std::stoi(foodItemIdStr);
-    std::ostringstream oss;  
+    std::ostringstream oss;
     oss << "provideFeedback:" << foodItemId << "," << rating << "," << comment;
     std::string request2 = oss.str();
 
@@ -82,7 +82,7 @@ void Employee::voteForFoodItems()
     std::string userID = receiveResponse();
     int ID = std::stoi(userID);
     std::vector<std::string> foodItems = getRolledOutFoodItems();
-    std::vector<std::string> recommendFoodItemsList  = recommendFoodItems(ID, foodItems);
+    std::vector<std::string> recommendFoodItemsList = recommendFoodItems(ID, foodItems);
     for (size_t i = 0; i < recommendFoodItemsList.size(); ++i)
     {
         std::cout << i + 1 << ". " << recommendFoodItemsList[i] << std::endl;
@@ -176,7 +176,7 @@ void Employee::createProfile(int userId)
     std::cout << "Please answer these questions to know your preferences" << std::endl;
 
     std::cout << "1) Please select one-\n- Vegetarian\n- Non Vegetarian\n- Eggetarian" << std::endl;
-    std::cin.ignore(); 
+    std::cin.ignore();
     std::getline(std::cin, preferenceValue);
     preferenceType = "Diet";
     savePreference(userId, preferenceType, preferenceValue);
@@ -197,7 +197,8 @@ void Employee::createProfile(int userId)
     savePreference(userId, preferenceType, preferenceValue);
 }
 
-bool Employee::isProfileCreated(int userId) {
+bool Employee::isProfileCreated(int userId)
+{
     std::string request = "isProfileCreated:" + std::to_string(userId);
     sendRequest(request);
     std::string response = receiveResponse();
@@ -206,7 +207,8 @@ bool Employee::isProfileCreated(int userId) {
     return response == "true";
 }
 
-bool Employee::savePreference(int userId, const std::string &preferenceType, const std::string &preferenceValue) {
+bool Employee::savePreference(int userId, const std::string &preferenceType, const std::string &preferenceValue)
+{
     std::string request = "savePreference:" + std::to_string(userId) + ":" + preferenceType + ":" + preferenceValue;
     sendRequest(request);
     std::string response = receiveResponse();
@@ -215,7 +217,8 @@ bool Employee::savePreference(int userId, const std::string &preferenceType, con
     return response == "Preference saved successfully";
 }
 
-std::string Employee::fetchEmployeePreferences(int employeeId) {
+std::string Employee::fetchEmployeePreferences(int employeeId)
+{
     std::string request = "fetchEmployeePreferences:" + std::to_string(employeeId);
     sendRequest(request);
     std::string response = receiveResponse();
@@ -252,10 +255,13 @@ std::vector<std::string> Employee::recommendFoodItems(int employeeId, const std:
         }
         foodItemMatches.push_back({availableFoodItem, matchCount});
     }
-    
-    for (size_t i = 0; i < foodItemMatches.size() - 1; ++i) {
-        for (size_t j = 0; j < foodItemMatches.size() - i - 1; ++j) {
-            if (foodItemMatches[j].second < foodItemMatches[j + 1].second) {
+
+    for (size_t i = 0; i < foodItemMatches.size() - 1; ++i)
+    {
+        for (size_t j = 0; j < foodItemMatches.size() - i - 1; ++j)
+        {
+            if (foodItemMatches[j].second < foodItemMatches[j + 1].second)
+            {
                 std::swap(foodItemMatches[j], foodItemMatches[j + 1]);
             }
         }
@@ -264,7 +270,7 @@ std::vector<std::string> Employee::recommendFoodItems(int employeeId, const std:
     std::vector<std::string> recommendedItems;
     for (const auto &item : foodItemMatches)
     {
-        if (item.second > 0) 
+        if (item.second > 0)
         {
             recommendedItems.push_back(item.first);
         }
@@ -308,10 +314,12 @@ void Employee::parseFoodItemDetailString(std::string foodItemDetailString)
     std::string line;
     std::vector<std::string> fields;
 
-    while (std::getline(stream, line, ':')) {
+    while (std::getline(stream, line, ':'))
+    {
         fields.push_back(line);
     }
-    if (fields.size() < 9) {
+    if (fields.size() < 9)
+    {
         std::cerr << "Invalid food item detail string format." << std::endl;
         return;
     }
