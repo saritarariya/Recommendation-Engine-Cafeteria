@@ -18,21 +18,6 @@ bool Admin::isValidCuisine(const std::string &cuisine)
     return std::find(validCuisines.begin(), validCuisines.end(), cuisine) != validCuisines.end();
 }
 
-std::string Admin::getNonEmptyInput(const std::string &prompt, const std::string &errorMessage)
-{
-    std::string input;
-    while (true)
-    {
-        std::cout << prompt;
-        std::getline(std::cin, input);
-        if (!input.empty())
-        {
-            return input;
-        }
-        std::cout << errorMessage << " Please press enter to provide input again.";
-        std::cin.ignore(1, '/n');
-    }
-}
 
 std::string Admin::getValidatedInput(const std::string &prompt, const std::string &errorMessage, bool (*isValid)(const std::string &))
 {
@@ -49,36 +34,6 @@ std::string Admin::getValidatedInput(const std::string &prompt, const std::strin
     }
 }
 
-std::string Admin::getNumericInput(const std::string &prompt, const std::string &errorMessage)
-{
-    std::string input;
-    while (true)
-    {
-        std::cout << prompt;
-        std::getline(std::cin, input);
-        if (!input.empty() && std::all_of(input.begin(), input.end(), ::isdigit))
-        {
-            return input;
-        }
-        std::cout << errorMessage << std::endl;
-    }
-}
-
-std::string Admin::getBinaryInput(const std::string &prompt, const std::string &errorMessage)
-{
-    std::string input;
-    while (true)
-    {
-        std::cout << prompt;
-        std::getline(std::cin, input);
-        if (input == "1" || input == "0")
-        {
-            return input;
-        }
-        std::cout << errorMessage << std::endl;
-    }
-}
-
 bool Admin::isValidCategory(const std::string &category)
 {
     static const std::vector<std::string> validCategories = {"Breakfast", "Lunch", "Dinner"};
@@ -87,15 +42,15 @@ bool Admin::isValidCategory(const std::string &category)
 
 void Admin::addMenuItem()
 {
-    std::string name = getNonEmptyInput("Enter the name of the menu item: ", "Name cannot be blank.");
-    std::string description = getNonEmptyInput("Enter the description of the menu item: ", "Description cannot be blank.");
-    std::string price = getNumericInput("Enter the price of the menu item: ", "Invalid input. Enter a numeric value for the price.");
+    std::string name = Utility::getNonEmptyInput("Enter the name of the menu item: ", "Name cannot be blank.");
+    std::string description = Utility::getNonEmptyInput("Enter the description of the menu item: ", "Description cannot be blank.");
+    std::string price = Utility::getNumericInput("Enter the price of the menu item: ", "Invalid input. Enter a numeric value for the price.");
     std::string category = getValidatedInput("Enter the category of the menu item (Breakfast, Lunch, Dinner): ", "Not a valid input.", Admin::isValidCategory);
-    std::string availability = getBinaryInput("Is the menu item available? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
+    std::string availability = Utility::getBinaryInput("Is the menu item available? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
     std::string type = getValidatedInput("Enter the type of the menu item (Vegetarian, Non Vegetarian, Eggetarian): ", "Not a valid input.", Admin::isValidType);
     std::string spiceLevel = getValidatedInput("Enter the spice level of the menu item (High, Medium, Low): ", "Not a valid input.", Admin::isValidSpiceLevel);
     std::string cuisine = getValidatedInput("Enter the cuisine of the menu item (North Indian, South Indian, Other): ", "Not a valid input.", Admin::isValidCuisine);
-    std::string isSweet = getBinaryInput("Is the menu item sweet? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
+    std::string isSweet = Utility::getBinaryInput("Is the menu item sweet? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
 
     std::string request = "addMenuItem:" + name + "\n" + description + "\n" + price + "\n" + category + "\n" + availability + "\n" + type + "\n" + spiceLevel + "\n" + cuisine + "\n" + isSweet + '\0';
 
@@ -127,7 +82,7 @@ void Admin::performRoleFunctions()
     while (true)
     {
         showOptions();
-        std::string choiceStr = getNumericInput("Enter your choice: ", "Invalid input.");
+        std::string choiceStr = Utility::getNumericInput("Enter your choice: ", "Invalid input.");
         int choice = stoi(choiceStr);
         switch (choice)
         {
@@ -154,7 +109,7 @@ void Admin::performRoleFunctions()
 
 void Admin::deleteMenuItem()
 {
-    std::string name = getNonEmptyInput("Enter the name of the menu item to delete: ", "name cannot be blank.");
+    std::string name = Utility::getNonEmptyInput("Enter the name of the menu item to delete: ", "name cannot be blank.");
     std::string request = "deleteMenuItem:" + name;
     sendRequest(request);
     std::string response = receiveResponse();
@@ -170,15 +125,15 @@ void Admin::deleteMenuItem()
 
 void Admin::updateMenuItem()
 {
-    std::string name = getNonEmptyInput("Enter the name of the menu item to update: ", "Name cannot be blank.");
-    std::string description = getNonEmptyInput("Enter the new description of the menu item: ", "Description cannot be blank.");
-    std::string price = getNumericInput("Enter the new price of the menu item: ", "Invalid input. Enter a numeric value for the price.");
+    std::string name = Utility::getNonEmptyInput("Enter the name of the menu item to update: ", "Name cannot be blank.");
+    std::string description = Utility::getNonEmptyInput("Enter the new description of the menu item: ", "Description cannot be blank.");
+    std::string price = Utility::getNumericInput("Enter the new price of the menu item: ", "Invalid input. Enter a numeric value for the price.");
     std::string category = getValidatedInput("Enter the new category of the menu item (Breakfast, Lunch, Dinner): ", "Not a valid input.", isValidCategory);
-    std::string availability = getBinaryInput("Is the menu item available now? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
+    std::string availability = Utility::getBinaryInput("Is the menu item available now? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
     std::string type = getValidatedInput("Enter the new type of the menu item (Vegetarian, Non Vegetarian, Eggetarian): ", "Not a valid input.", isValidType);
     std::string spiceLevel = getValidatedInput("Enter the new spice level of the menu item (High, Medium, Low): ", "Not a valid input.", isValidSpiceLevel);
     std::string cuisine = getValidatedInput("Enter the new cuisine of the menu item (North Indian, South Indian, Other): ", "Not a valid input.", isValidCuisine);
-    std::string isSweet = getBinaryInput("Is the menu item sweet? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
+    std::string isSweet = Utility::getBinaryInput("Is the menu item sweet? (1 for Yes, 0 for No): ", "Invalid input. Enter 1 for Yes or 0 for No.");
 
     std::string request = "updateMenuItem:" + name + "\n" + price + "\n" + availability + "\n" + description + "\n" + category + "\n" + type + "\n" + spiceLevel + "\n" + cuisine + "\n" + isSweet + "\0";
 

@@ -12,6 +12,7 @@
 #include <vector>
 #include "User.h"
 #include "Client.h"
+#include "Utility.h"
 #include "RecommendationEngine.h"
 
 class Chef : public User
@@ -38,8 +39,7 @@ private:
     void handleDiscardMenuItemActions();
     void deleteMenuItem();
     void getDetailedFeedback();
-    int getValidatedNumericInput(const std::string &prompt, const std::string &errorMessage, int range);
-
+    
 public:
     Chef(Client *client) : User(client) {}
     void performRoleFunctions();

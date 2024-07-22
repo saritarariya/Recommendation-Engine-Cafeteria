@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <FoodItem.h>
+#include "Utility.h"
 #include "User.h"
 #include "Client.h"
 

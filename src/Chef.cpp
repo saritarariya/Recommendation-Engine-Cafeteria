@@ -46,18 +46,23 @@ void Chef::chooseFoodItemsForNextDay()
         displayFoodItemOptions();
         std::string prompt = "Enter your choice:";
         std::string errorMessage = "Invalid choice. Please try again.";
-        int choice = getValidatedNumericInput(prompt, errorMessage, 4);
+        std::string choiceStr = Utility::getNumericInput(prompt, errorMessage);
+        int choice = stoi(choiceStr);
         if (choice == 1)
         {
             chosenItems = chooseFromTopRecommended(topFoodItems, chosenItems);
         }
-        if (choice == 2)
+        else if (choice == 2)
         {
             viewAllMenuItems();
         }
-        if (choice == 3)
+        else if (choice == 3)
         {
             displayChosenItems(chosenItems);
+        }
+        else
+        {
+            std::cout << errorMessage;
         }
         std::cout << "You have chosen " << chosenItems.size() << " items out of 5." << std::endl;
     }
@@ -72,31 +77,22 @@ void Chef::displayFoodItemOptions()
     std::cout << "3. View Chosen Items" << std::endl;
 }
 
-int Chef::getValidatedNumericInput(const std::string &prompt, const std::string &errorMessage, int range)
-{
-    std::string input;
-    while (true)
-    {
-        std::cout << prompt;
-        std::getline(std::cin, input);
-        if (!input.empty() && std::all_of(input.begin(), input.end(), ::isdigit))
-        {
-            int choice = stoi(input);
-            if (choice < range && choice > 0)
-            {
-                return choice;
-            }
-        }
-        std::cout << errorMessage << std::endl;
-    }
-}
 
 std::vector<std::string> Chef::chooseFromTopRecommended(const std::vector<std::string> &topFoodItems, std::vector<std::string> chosenItems)
 {
     displayTopFoodItems(topFoodItems);
     std::string prompt = "Enter the number of the food item to choose (1-5): ";
     std::string errorMessage = "Invalid choice. Please select a number between 1 and 5.";
-    int itemChoice = getValidatedNumericInput(prompt, errorMessage, 6);
+    int itemChoice;
+    while(true)
+    {
+        std::string itemChoiceStr = Utility::getNumericInput(prompt, errorMessage);
+        itemChoice = stoi(itemChoiceStr);
+        if((itemChoice > 0) && (itemChoice < 6))
+        {
+            break;
+        }
+    }
     chosenItems.push_back(topFoodItems[itemChoice - 1]);
     return chosenItems;
 }
@@ -248,7 +244,8 @@ void Chef::performRoleFunctions()
         displayMainMenu();
         std::string prompt = "Enter your choice :";
         std::string errorMessage = "Invalid choice. Please try again.";
-        int choice = getValidatedNumericInput(prompt, errorMessage, 8);
+        std::string choiceStr = Utility::getNumericInput(prompt, errorMessage);
+        int choice = stoi(choiceStr);
         switch (choice)
         {
         case 1:
@@ -366,7 +363,20 @@ void Chef::handleDiscardMenuItemActions()
     std::cout << "2. Get Detailed Feedback:" << std::endl;
     std::string prompt = "Enter your choice :";
     std::string errorMessage = "Invalid choice. Please try again.";
-    int choice = getValidatedNumericInput(prompt, errorMessage, 3);
+    int choice;
+    while(true)
+    {
+        std::string itemChoiceStr = Utility::getNumericInput(prompt, errorMessage);
+        choice = stoi(itemChoiceStr);
+        if((choice > 0) && (choice < 3))
+        {
+            break;
+        }
+        else
+        {
+            std::cout << errorMessage;
+        }
+    }
     if (choice == 1)
     {
         deleteMenuItem();
