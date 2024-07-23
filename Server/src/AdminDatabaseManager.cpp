@@ -40,10 +40,8 @@ bool AdminDatabaseManager::deleteFoodItem(const std::string &foodItemName)
 
     try
     {
-        // Start a transaction
         conn->setAutoCommit(false);
 
-        // First, get the foodItemID for the given foodItemName
         std::string query = "SELECT FoodItemID FROM fooditems WHERE FoodItemName = ?";
         pstmt = conn->prepareStatement(query);
         pstmt->setString(1, foodItemName);
@@ -63,35 +61,30 @@ bool AdminDatabaseManager::deleteFoodItem(const std::string &foodItemName)
             return false;
         }
 
-        // Delete the corresponding rows from feedback table
         query = "DELETE FROM feedback WHERE FoodItemID = ?";
         pstmt = conn->prepareStatement(query);
         pstmt->setInt(1, foodItemID);
         pstmt->executeUpdate();
         delete pstmt;
 
-        // Delete the corresponding rows from discardmenuitemlist table
         query = "DELETE FROM discardmenuitemlist WHERE foodItemID = ?";
         pstmt = conn->prepareStatement(query);
         pstmt->setInt(1, foodItemID);
         pstmt->executeUpdate();
         delete pstmt;
 
-        // Delete the corresponding rows from votes table
         query = "DELETE FROM votes WHERE FoodItemID = ?";
         pstmt = conn->prepareStatement(query);
         pstmt->setInt(1, foodItemID);
         pstmt->executeUpdate();
         delete pstmt;
 
-        // Now, delete the food item from the fooditems table
         query = "DELETE FROM fooditems WHERE FoodItemID = ?";
         pstmt = conn->prepareStatement(query);
         pstmt->setInt(1, foodItemID);
         pstmt->executeUpdate();
         delete pstmt;
 
-        // Commit the transaction
         conn->commit();
         conn->setAutoCommit(true);
 

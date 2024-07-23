@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <vector>
 #include "User.h"
-#include "Client.h"
 #include "Utility.h"
 #include "RecommendationEngine.h"
 
@@ -39,7 +38,7 @@ private:
     void handleDiscardMenuItemActions();
     void deleteMenuItem();
     void getDetailedFeedback();
-    
+
 public:
     Chef(Client *client) : User(client) {}
     void performRoleFunctions();

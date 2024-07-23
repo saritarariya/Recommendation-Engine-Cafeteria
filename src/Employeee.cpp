@@ -5,51 +5,88 @@ void Employee::viewNotifications()
     std::string request = "viewNotifications:";
     sendRequest(request);
     std::string response = receiveResponse();
-    std::cout << "Server response:" << std::endl;
-    std::cout << response << std::endl;
+    if (response.empty())
+    {
+        std::cerr << "Failed to retrieve notifications. Please try again later." << std::endl;
+        return;
+    }
+    std::cout << "Server response:" << response << std::endl;
+}
+
+void Employee::displayAllMenuItems()
+{
+    sendRequest("showAllMenuItems");
+    std::string response = receiveResponse();
+    if (response.empty())
+    {
+        std::cerr << "Failed to retrieve menu items. Please try again later." << std::endl;
+        return;
+    }
+    std::cout << "Menu Items:" << std::endl << response << std::endl;
+}
+
+int Employee::fetchFoodItemId(const std::string &foodItemName)
+{
+    std::string trimmedName = foodItemName;
+    trimmedName.erase(trimmedName.begin(), std::find_if(trimmedName.begin(), trimmedName.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+
+    std::string request = "getFoodItemId: " + trimmedName;
+    sendRequest(request);
+    std::string response = receiveResponse();
+    if (response.empty())
+    {
+        std::cerr << "Failed to retrieve food item ID." << std::endl;
+        return -1;
+    }
+    return std::stoi(response);
 }
 
 void Employee::provideFeedback()
 {
-    std::string request = "showAllMenuItems";
-    sendRequest(request);
-    std::string response = receiveResponse();
-    std::cout << "Server response:" << std::endl;
-    std::cout << response << std::endl;
+    displayAllMenuItems();
 
-    int foodItemId, rating;
-    std::string comment;
-    std::string FoodItemName;
-    std::cout << "Enter Food Item name: ";
-    std::cin.ignore();
-    std::getline(std::cin, FoodItemName);
-    std::cout << "Enter Rating (1-5): ";
-    std::cin >> rating;
+    std::string FoodItemName = Utility::getNonEmptyInput("Enter Food Item name: ", "Name cannot be blank.");
+    std::string rating = Utility::getNumericInput("Enter Rating (1-5): ", "Invalid input. Enter a numeric value for the rating(1-5)");
+    std::string comment = Utility::getNonEmptyInput("Enter comment: ", "Comment cannot be blank.");
 
-    std::cin.ignore(1, '\n');
-    std::cout << "Enter Comment: ";
-    std::getline(std::cin, comment);
-
-    std::string request1 = "getFoodItemId: " + FoodItemName;
-    sendRequest(request1);
-    std::string foodItemIdStr = receiveResponse();
-    foodItemId = std::stoi(foodItemIdStr);
+    int foodItemId = fetchFoodItemId(FoodItemName);
+    if (foodItemId == -1)
+    {
+        std::cerr << "Failed to fetch the food item ID. Please try again." << std::endl;
+        return;
+    }
     std::ostringstream oss;
     oss << "provideFeedback:" << foodItemId << "," << rating << "," << comment;
-    std::string request2 = oss.str();
+    std::string request = oss.str();
 
-    sendRequest(request2);
-    std::string response1 = receiveResponse();
-    std::cout << "Server response:" << std::endl;
-    std::cout << response1 << std::endl;
+    sendRequest(request);
+    std::string response = receiveResponse();
+    if (response.empty())
+    {
+        std::cerr << "Failed to provide feedback. Please try again later." << std::endl;
+        return;
+    }
+    std::cout << "Server response:" << std::endl << response;
+}
+
+std::string Employee::viewNotificationsHelper()
+{
+    sendRequest("viewNotifications:");
+    return receiveResponse();
 }
 
 std::vector<std::string> Employee::getRolledOutFoodItems()
 {
     std::vector<std::string> foodItems;
-    std::string request = "viewNotifications:";
-    sendRequest(request);
-    std::string response = receiveResponse();
+    std::string response = viewNotificationsHelper();
+
+    if (response.empty())
+    {
+        std::cerr << "Failed to retrieve rolled out food items. Please try again later." << std::endl;
+        return foodItems;
+    }
 
     std::vector<std::string> notifications;
     std::istringstream iss(response);
@@ -75,44 +112,52 @@ std::vector<std::string> Employee::getRolledOutFoodItems()
     return foodItems;
 }
 
+std::string Employee::fetchUserId()
+{
+    sendRequest("getID:");
+    return receiveResponse();
+}
+
 void Employee::voteForFoodItems()
 {
-    std::string request = "getID:";
-    sendRequest(request);
-    std::string userID = receiveResponse();
-    int ID = std::stoi(userID);
-    std::vector<std::string> foodItems = getRolledOutFoodItems();
-    std::vector<std::string> recommendFoodItemsList = recommendFoodItems(ID, foodItems);
-    for (size_t i = 0; i < recommendFoodItemsList.size(); ++i)
+    std::string userIdStr = fetchUserId();
+    if (userIdStr.empty())
     {
-        std::cout << i + 1 << ". " << recommendFoodItemsList[i] << std::endl;
+        std::cerr << "Failed to fetch user ID. Please try again later." << std::endl;
+        return;
     }
 
-    std::cout << "Enter the number of the food item to vote for: ";
-    int itemChoice;
-    std::cin >> itemChoice;
-
-    if (itemChoice >= 0 && itemChoice <= recommendFoodItemsList.size())
+    int userId = std::stoi(userIdStr);
+    std::vector<std::string> rolledOutFoodItems = getRolledOutFoodItems();
+    std::vector<std::string> recommendedFoodItems = recommendFoodItems(userId, rolledOutFoodItems);
+    for (size_t i = 0; i < recommendedFoodItems.size(); ++i)
     {
-        std::string request1 = "getFoodItemId:" + recommendFoodItemsList[itemChoice - 1];
-        sendRequest(request1);
-        std::string foodItemIdStr = receiveResponse();
-        int foodItemId = std::stoi(foodItemIdStr);
+        std::cout << i + 1 << ". " << recommendedFoodItems[i] << std::endl;
+    }
 
-        if (foodItemId != -1)
+    std::string prompt = "Enter the number of the food item to vote for:(1-5)";
+    std::string errorMessage = "Invalid input please try again";
+    std::string itemChoiceStr = Utility::getNumericInput(prompt, errorMessage);
+    int itemChoice = stoi(itemChoiceStr);
+    if (itemChoice >= 0 && itemChoice <= recommendedFoodItems.size())
+    {
+        int foodItemId = fetchFoodItemId(recommendedFoodItems[itemChoice - 1]);
+        if (foodItemId == -1)
         {
-            std::ostringstream oss;
-            oss << "submitVote:" << userID << "," << foodItemId;
+            std::cerr << "Failed to fetch the food item ID. Please try again later." << std::endl;
+            return;
+        }
 
-            std::string request2 = oss.str();
-            sendRequest(request2);
-            std::string response = receiveResponse();
-            std::cout << "Server response: " << response << std::endl;
-        }
-        else
+        std::ostringstream oss;
+        oss << "submitVote:" << userId << "," << foodItemId;
+        sendRequest(oss.str());
+        std::string response = receiveResponse();
+        if (response.empty())
         {
-            std::cout << "Note able to fetch the correct food item ID.";
+            std::cerr << "Failed to submit vote. Please try again later." << std::endl;
+            return;
         }
+        std::cout << "Server response: " << response << std::endl;
     }
     else
     {
@@ -120,19 +165,24 @@ void Employee::voteForFoodItems()
     }
 }
 
+void Employee::displayMainMenu()
+{
+    std::cout << "Please choose an operation:" << std::endl;
+    std::cout << "1. Provide Feedback" << std::endl;
+    std::cout << "2. Choose Food Items for Next Day" << std::endl;
+    std::cout << "3. View Notifications" << std::endl;
+    std::cout << "4. Exit" << std::endl;
+}
+
 void Employee::performRoleFunctions()
 {
-    int choice;
-    do
+    while (true)
     {
-        std::cout << "Please choose an operation:" << std::endl;
-        std::cout << "1. Provide Feedback" << std::endl;
-        std::cout << "2. Choose Food Items for Next Day" << std::endl;
-        std::cout << "3. View Notifications" << std::endl;
-        std::cout << "4. Exit" << std::endl;
-        std::cout << "Enter your choice: ";
-        std::cin >> choice;
-
+        displayMainMenu();
+        std::string prompt =  "Enter your choice: ";
+        std::string errorMessage = "Invalid choice. Please try again.";
+        std::string choiceStr = Utility::getNonEmptyInput(prompt,errorMessage);
+        int choice = stoi(choiceStr);
         switch (choice)
         {
         case 1:
@@ -146,12 +196,12 @@ void Employee::performRoleFunctions()
             break;
         case 4:
             std::cout << "Exiting..." << std::endl;
-            break;
+            return;
         default:
             std::cout << "Invalid choice. Please try again." << std::endl;
             break;
         }
-    } while (choice != 5);
+    }
 }
 
 void Employee::viewAllMenuItems()
@@ -167,32 +217,23 @@ void Employee::createProfile(int userId)
 {
     if (isProfileCreated(userId))
     {
-        std::cout << "Profile already created. Skipping profile creation." << std::endl;
         return;
     }
-
-    std::string preferenceType, preferenceValue;
-
     std::cout << "Please answer these questions to know your preferences" << std::endl;
 
-    std::cout << "1) Please select one-\n- Vegetarian\n- Non Vegetarian\n- Eggetarian" << std::endl;
-    std::cin.ignore();
-    std::getline(std::cin, preferenceValue);
-    preferenceType = "Diet";
+    std::string preferenceValue = Utility::getValidatedInput("1) Please select one-\n- Vegetarian\n- Non Vegetarian\n- Eggetarian", "Not a valid input.", Utility::isValidType);
+    std::string preferenceType = "Diet";
     savePreference(userId, preferenceType, preferenceValue);
 
-    std::cout << "2) Please select your spice level\n- High\n- Medium\n- Low" << std::endl;
-    std::getline(std::cin, preferenceValue);
+    preferenceValue = Utility::getValidatedInput("2) Please select your spice level\n- High\n- Medium\n- Low", "Not a valid input.", Utility::isValidSpiceLevel);
     preferenceType = "Spice Level";
     savePreference(userId, preferenceType, preferenceValue);
 
-    std::cout << "3) What do you prefer most?\n- North Indian\n- South Indian\n- Other" << std::endl;
-    std::getline(std::cin, preferenceValue);
+    preferenceValue = Utility::getValidatedInput("3) What do you prefer most?\n- North Indian\n- South Indian\n- Other", "Not a valid input.", Utility::isValidCuisine);
     preferenceType = "Cuisine";
     savePreference(userId, preferenceType, preferenceValue);
 
-    std::cout << "4) Do you have a sweet tooth?\n- Yes\n- No" << std::endl;
-    std::getline(std::cin, preferenceValue);
+    preferenceValue = Utility::getBinaryInput("4) Do you have a sweet tooth?\n- Yes\n- No", "Invalid input. Enter 1 for Yes or 0 for No.");
     preferenceType = "Sweet Tooth";
     savePreference(userId, preferenceType, preferenceValue);
 }
@@ -203,7 +244,6 @@ bool Employee::isProfileCreated(int userId)
     sendRequest(request);
     std::string response = receiveResponse();
     std::cout << "Server response:" << std::endl;
-    std::cout << response << std::endl;
     return response == "true";
 }
 
@@ -212,8 +252,6 @@ bool Employee::savePreference(int userId, const std::string &preferenceType, con
     std::string request = "savePreference:" + std::to_string(userId) + ":" + preferenceType + ":" + preferenceValue;
     sendRequest(request);
     std::string response = receiveResponse();
-    std::cout << "Server response:" << std::endl;
-    std::cout << response << std::endl;
     return response == "Preference saved successfully";
 }
 
@@ -225,37 +263,34 @@ std::string Employee::fetchEmployeePreferences(int employeeId)
     return response.empty() ? "No preferences found" : response;
 }
 
+int Employee::countPreferenceMatches(const std::vector<std::pair<std::string, std::string>> &preferences, const FoodItem *foodItem)
+{
+    int matchCount = 0;
+    for (const auto &preference : preferences)
+    {
+        if ((preference.first == "Diet" && preference.second == foodItem->getType() ||
+            (preference.first == "Spice Level" && preference.second == foodItem->getSpiceLevel()) ||
+            (preference.first == "Cuisine" && preference.second == foodItem->getCuisine())))
+        {
+            ++matchCount;
+        }
+    }
+    return matchCount;
+}
+
 std::vector<std::string> Employee::recommendFoodItems(int employeeId, const std::vector<std::string> &availableFoodItems)
 {
     std::string preferenceString = fetchEmployeePreferences(employeeId);
     std::vector<std::pair<std::string, std::string>> preferences = parsePreferences(preferenceString);
     std::vector<std::pair<std::string, int>> foodItemMatches;
+
     for (const auto &availableFoodItem : availableFoodItems)
     {
-        getFoodItemDetails(availableFoodItem);
-        int matchCount = 0;
-        for (const auto &preference : preferences)
-        {
-            if ((preference.first == "Diet") && (preference.second == foodItem->getType()))
-            {
-                matchCount++;
-            }
-            else if ((preference.first == "Spice Level") && (preference.second == foodItem->getSpiceLevel()))
-            {
-                matchCount++;
-            }
-            else if ((preference.first == "Cuisine") && (preference.second == foodItem->getCuisine()))
-            {
-                matchCount++;
-            }
-            else if ((preference.first == "Sweet Tooth") && (preference.second == foodItem->isFoodSweet()))
-            {
-                matchCount++;
-            }
-        }
+        foodItem = getFoodItemDetails(availableFoodItem);
+        int matchCount = countPreferenceMatches(preferences, foodItem);
         foodItemMatches.push_back({availableFoodItem, matchCount});
     }
-
+    
     for (size_t i = 0; i < foodItemMatches.size() - 1; ++i)
     {
         for (size_t j = 0; j < foodItemMatches.size() - i - 1; ++j)
@@ -300,15 +335,16 @@ std::vector<std::pair<std::string, std::string>> Employee::parsePreferences(cons
     return preferences;
 }
 
-void Employee::getFoodItemDetails(std::string foodItemName)
+FoodItem *Employee::getFoodItemDetails(std::string foodItemName)
 {
     std::string request = "getFoodItemDetails:" + foodItemName;
     sendRequest(request);
     std::string response = receiveResponse();
     parseFoodItemDetailString(response);
+    return parseFoodItemDetailString(response);
 }
 
-void Employee::parseFoodItemDetailString(std::string foodItemDetailString)
+FoodItem *Employee::parseFoodItemDetailString(std::string foodItemDetailString)
 {
     std::istringstream stream(foodItemDetailString);
     std::string line;
@@ -317,11 +353,6 @@ void Employee::parseFoodItemDetailString(std::string foodItemDetailString)
     while (std::getline(stream, line, ':'))
     {
         fields.push_back(line);
-    }
-    if (fields.size() < 9)
-    {
-        std::cerr << "Invalid food item detail string format." << std::endl;
-        return;
     }
     std::string name = fields[0];
     std::string description = fields[1];
@@ -333,4 +364,5 @@ void Employee::parseFoodItemDetailString(std::string foodItemDetailString)
     std::string cuisine = fields[7];
     bool isSweet = (fields[8] == "Yes");
     foodItem = new FoodItem(name, description, price, category, availability, type, spiceLevel, cuisine, isSweet);
+    return foodItem;
 }

@@ -6,39 +6,38 @@ void RecommendationEngine::addFeedback(int feedbackId, int userId, int foodItemI
 }
 
 std::vector<int> RecommendationEngine::getTopFoodItems() const {
-    std::unordered_map<int, std::pair<int, int>> food_stats;
+    std::unordered_map<int, std::pair<int, int>> foodStats;
 
     for (const auto& feedback : feedbacks) {
         int foodItemId = feedback.getFoodItemId();
 
-        if (food_stats.find(foodItemId) == food_stats.end()) {
-            food_stats[foodItemId] = std::make_pair(0, 0);
+        if (foodStats.find(foodItemId) == foodStats.end()) {
+            foodStats[foodItemId] = std::make_pair(0, 0);
         }
 
-        int sentiment_score = feedback.calculateSentimentScore();
+        int sentimentScore = feedback.calculateSentimentScore();
 
-        food_stats[foodItemId].first += feedback.getRating() + sentiment_score;
-        food_stats[foodItemId].second++;
+        foodStats[foodItemId].first += feedback.getRating() + sentimentScore;
+        foodStats[foodItemId].second++;
     }
 
-    std::vector<std::pair<int, double>> sorted_food_items;
-    for (const auto& entry : food_stats) {
+    std::vector<std::pair<int, double>> sortedFoodItems;
+    for (const auto& entry : foodStats) {
         double average_score = static_cast<double>(entry.second.first) / entry.second.second;
-        sorted_food_items.emplace_back(entry.first, average_score);
+        sortedFoodItems.emplace_back(entry.first, average_score);
     }
 
-    std::sort(sorted_food_items.begin(), sorted_food_items.end(), [](auto &left, auto &right) {
+    std::sort(sortedFoodItems.begin(), sortedFoodItems.end(), [](auto &left, auto &right) {
         return left.second > right.second;
     });
 
-    std::vector<int> top_food_items;
+    std::vector<int> topFoodItems;
     int count = 0;
-    for (const auto& item : sorted_food_items) {
-        top_food_items.push_back(item.first);
+    for (const auto& item : sortedFoodItems) {
+        topFoodItems.push_back(item.first);
         if (++count >= 5) break;
     }
-
-    return top_food_items;
+    return topFoodItems;
 }
 
 void RecommendationEngine::parseAndAddFeedbacks(const std::string& feedbackData) {

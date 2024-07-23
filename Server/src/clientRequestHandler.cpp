@@ -336,7 +336,7 @@ void ClientRequestHandler::handleGetVotesForFoodItem(const std::string &request,
 
 void ClientRequestHandler::handleIsProfileCreated(const std::string &request, const SOCKET clientSocket)
 {
-    std::string userIdStr = request.substr(17); // Extract userId after "isProfileCreated:"
+    std::string userIdStr = request.substr(17);
     int userId = std::stoi(userIdStr);
 
     bool profileCreated = employeeDbManager.isProfileCreated(userId);

@@ -146,6 +146,7 @@
     <ClInclude Include="Inc\FoodItem.h" />
     <ClInclude Include="Inc\RecommendationEngine.h" />
     <ClInclude Include="Inc\User.h" />
+    <ClInclude Include="Inc\Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AccessManger.cpp" />
@@ -157,6 +158,8 @@
     <ClCompile Include="src\FoodItem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\RecommendationEngine.cpp" />
+    <ClCompile Include="src\User.cpp" />
+    <ClCompile Include="src\Utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

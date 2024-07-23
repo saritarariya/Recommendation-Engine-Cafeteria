@@ -23,10 +23,5 @@ private:
     void updateMenuItem();
     void showOptions();
     void viewAllMenuItems();
-    static bool isValidCuisine(const std::string &cuisine);
-    static bool isValidSpiceLevel(const std::string &spiceLevel);
-    static bool isValidType(const std::string &type);
-    static bool isValidCategory(const std::string &category);
-    static std::string getValidatedInput(const std::string &prompt, const std::string &errorMessage, bool (*isValid)(const std::string &));
 };
 #endif

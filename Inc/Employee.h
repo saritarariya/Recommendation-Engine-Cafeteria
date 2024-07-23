@@ -5,10 +5,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <FoodItem.h>
+#include "FoodItem.h"
 #include "Utility.h"
 #include "User.h"
-#include "Client.h"
 
 class Employee : public User
 {
@@ -24,12 +23,19 @@ private:
     std::vector<std::string> recommendFoodItems(int employeeId, const std::vector<std::string> &availableFoodItems);
     std::vector<std::pair<std::string, std::string>> parsePreferences(const std::string &preferenceString);
     std::string fetchEmployeePreferences(int employeeId);
-    void getFoodItemDetails(std::string foodItemID);
-    void parseFoodItemDetailString(std::string foodItemDetailString);
+    FoodItem *getFoodItemDetails(std::string foodItemID);
+    FoodItem *parseFoodItemDetailString(std::string foodItemDetailString);
+    void displayAllMenuItems();
+    int fetchFoodItemId(const std::string &foodItemName);
+    std::string viewNotificationsHelper();
+    void displayMainMenu();
+    int countPreferenceMatches(const std::vector<std::pair<std::string, std::string>> &preferences, const FoodItem *foodItem);
+    std::string fetchUserId();
 
 public:
     Employee(Client* client) : User(client){}
     void performRoleFunctions();
     void createProfile(int userId);
 };
+
 #endif
